@@ -1,0 +1,25 @@
+fileFormatVersion: 2
+guid: 033d1c9312ac7fd4f85e1a02ccd44afa
+timeCreated: 1482078080
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Consolas
+  fontNames:
+  - Consolas
+  - Microsoft JhengHei
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: a0d51fa2f025635438fc069199731344, type: 3}
+  - {fileID: 12800000, guid: a4398796b513a164b96e36e3ae38dc80, type: 3}
+  - {fileID: 12800000, guid: c77b56e82737c24419bc06995d9c7fe2, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
