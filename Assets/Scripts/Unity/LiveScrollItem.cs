@@ -8,6 +8,11 @@ namespace LoveLivePractice.Unity {
 			set { rectTrans.sizeDelta = new Vector2(value, rectTrans.sizeDelta.y); }
 		}
 
+		public float Y {
+			get { return rectTrans.anchoredPosition.y; }
+			set { rectTrans.anchoredPosition = new Vector2(rectTrans.anchoredPosition.x, value); }
+		}
+
 		public RectTransform rectTrans, coverUiRawImageRectTrans;
 		public RawImage coverUiRawImage;
 		public Text titleUiText, authorUiText, tagUiText, starsUiText;
