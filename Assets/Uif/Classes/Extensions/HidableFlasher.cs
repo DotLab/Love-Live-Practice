@@ -12,21 +12,20 @@ namespace Uif {
 
 		public bool InverseOrder;
 
-		void OnValidate () {
+		void OnValidate() {
 			Hidable = GetComponent<EasedHidable>();
 		}
-
-		void Start () {
+	
+		void Start() {
 			StartCoroutine(FlashHandler());
 		}
 
-		public void Stop () {
+		public void Stop() {
 			StopAllCoroutines();
 		}
 
-		IEnumerator FlashHandler () {
-			if (InverseOrder)
-				while (true) {
+		IEnumerator FlashHandler() {
+			if (InverseOrder) while (true) {
 					Hidable.Hide();
 					yield return new WaitForSeconds(HideWait);
 

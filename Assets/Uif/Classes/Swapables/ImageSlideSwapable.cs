@@ -16,34 +16,32 @@ namespace Uif {
 		public bool LockY;
 		public float StartY;
 		public float EndY;
-
+	
 		RectTransform trans;
 
-		void OnValidate () {
+		void OnValidate() {
 			if (MainImage == null) MainImage = GetComponent<Image>();
 			if (TransitionImage == null) TransitionImage = transform.Find("Transition").GetComponent<Image>();
 		}
 
-		void Awake () {
+		void Awake() {
 			trans = TransitionImage.GetComponent<RectTransform>();
 		}
 
-		public override void Swap (Sprite newSprite) {
-			if ((MainImage.sprite == newSprite && TransitionImage.sprite == null) || TransitionImage.sprite == newSprite)
-				return;
+		public override void Swap(Sprite newSprite) {
+			if ((MainImage.sprite == newSprite && TransitionImage.sprite == null) || TransitionImage.sprite == newSprite) return;
 
 			StopAllCoroutines();
 			StartCoroutine(SwapHandler(MainImage.sprite, MainImage.color.a, newSprite));
 		}
 
-		public override void ForceSwap (Sprite newSprite) {
-			if ((MainImage.sprite == newSprite && TransitionImage.sprite == null) || TransitionImage.sprite == newSprite)
-				return;
+		public override void ForceSwap(Sprite newSprite) {
+			if ((MainImage.sprite == newSprite && TransitionImage.sprite == null) || TransitionImage.sprite == newSprite) return;
 
 			MainImage.sprite = newSprite;
 		}
 
-		IEnumerator SwapHandler (Sprite srcSprite, float srcAlpha, Sprite dstSprite) {
+		IEnumerator SwapHandler(Sprite srcSprite, float srcAlpha, Sprite dstSprite) {
 			float time = 0;
 
 			MainImage.sprite = srcSprite;
@@ -73,7 +71,7 @@ namespace Uif {
 				LockY ? trans.anchoredPosition.y : StartY);
 		}
 
-		static Color SetAlpha (Color baseColor, float alpha) {
+		static Color SetAlpha(Color baseColor, float alpha) {
 			baseColor.a = alpha;
 			return baseColor;
 		}

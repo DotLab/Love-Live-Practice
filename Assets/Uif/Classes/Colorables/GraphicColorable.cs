@@ -5,18 +5,19 @@ namespace Uif {
 	[AddComponentMenu("Uif/Colorable/Graphic Colorable")]
 	[RequireComponent(typeof(Graphic))]
 	public class GraphicColorable : Colorable {
-		public Graphic Graphic;
+		public Graphic graphic;
 
-		void OnValidate () {
-			Graphic = GetComponent<Graphic>();
+
+		public void OnValidate() {
+			graphic = GetComponent<Graphic>();
 		}
 
-		public override Color GetColor () {
-			return Graphic.color;
+		public override Color GetColor() {
+			return graphic.color;
 		}
 
-		public override void SetColor (Color newColor) {
-			Graphic.color = newColor;
+		public override void SetColor(Color newColor) {
+			graphic.color = newColor;
 		}
 	}
 }

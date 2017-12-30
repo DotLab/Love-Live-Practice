@@ -2,8 +2,8 @@
 
 namespace Uif {
 	public interface IColorable {
-		Color GetColor ();
-
-		void SetColor (Color newColor);
+		Color GetColor();
+	
+		void SetColor(Color newColor);
 	}
 }

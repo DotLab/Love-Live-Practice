@@ -1,12 +1,12 @@
 ﻿namespace Uif {
 	public interface IHidable {
-		bool Shown ();
+		bool Shown();
+	
+		bool Hided();
 
-		bool Hided ();
+		void Show();
 
-		void Show ();
-
-		void Hide ();
+		void Hide();
 	}
 
 	public enum HidableState {

@@ -8,16 +8,16 @@ namespace Uif {
 		public HidableState StartState;
 		public HidableAction StartAction;
 
-		public virtual void Awake () {
+		public virtual void Awake() {
 			switch (StartState) {
-			case HidableState.Shown:
-				ForceShow();
-				break;
-			case HidableState.Hided:
-				ForceHide();
-				break;
+				case HidableState.Shown:
+					ForceShow();
+					break;
+				case HidableState.Hided:
+					ForceHide();
+					break;
 			}
-
+		
 //			switch (StartAction) {
 //			case HidableAction.Show:
 //				Show();
@@ -28,35 +28,35 @@ namespace Uif {
 //			}
 		}
 
-		public virtual void Start () {
+		public virtual void Start() {
 			switch (StartAction) {
-			case HidableAction.Show:
-				Show();
-				break;
-			case HidableAction.Hide:
-				Hide();
-				break;
+				case HidableAction.Show:
+					Show();
+					break;
+				case HidableAction.Hide:
+					Hide();
+					break;
 			}
 		}
 
-		public abstract bool Shown ();
+		public abstract bool Shown();
 
-		public abstract bool Hided ();
+		public abstract bool Hided();
 
-		public abstract void Show ();
+		public abstract void Show();
 
-		public abstract void Hide ();
+		public abstract void Hide();
 
-		public abstract void ForceShow ();
+		public abstract void ForceShow();
 
-		public abstract void ForceHide ();
+		public abstract void ForceHide();
 
-		public virtual void Set (bool show) {
+		public virtual void Set(bool show) {
 			if (show) Show();
 			else Hide();
 		}
 
-		public virtual void ForceSet (bool show) {
+		public virtual void ForceSet(bool show) {
 			if (show) ForceShow();
 			else ForceHide();
 		}

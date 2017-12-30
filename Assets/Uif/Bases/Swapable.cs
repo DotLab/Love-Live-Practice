@@ -5,10 +5,9 @@ namespace Uif {
 		public EasingType TransitionEasingType = EasingType.Cubic;
 		public float TransitionDuration = 0.5f;
 
+		public abstract void Swap(T newItem);
 
-		public abstract void Swap (T newItem);
-
-		public abstract void ForceSwap (T newItem);
+		public abstract void ForceSwap(T newItem);
 	}
 
 	public abstract class ColorSwapable : Swapable<Color> {

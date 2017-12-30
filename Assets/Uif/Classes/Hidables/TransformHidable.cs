@@ -4,7 +4,7 @@ namespace Uif {
 	[AddComponentMenu("Uif/Hidable/Transform Hidable")]
 	public class TransformHidable : EasedHidable {
 		[System.Serializable]
-		public struct Translation {
+		public class Translation {
 			public Vector3 Position;
 			public Vector3 Rotation;
 			public Vector3 Scale;
@@ -14,9 +14,6 @@ namespace Uif {
 			}
 		}
 
-		public Transform Trans;
-
-		[Space]
 		public bool TransPosition;
 		public bool TransRotation;
 		public bool TransScale;
@@ -25,84 +22,79 @@ namespace Uif {
 		public Translation ShowTranslation;
 		public Translation HideTranslation;
 
+		[Space]
+		public Transform trans;
+
+
+		public void OnValidate() {
+			trans = GetComponent<Transform>();
+		}
+
 		[ContextMenu("Record Show Translation")]
-		public void RecordShowTranslation () {
-			ShowTranslation.Position = Trans.localPosition;
-			ShowTranslation.Rotation = Trans.localRotation.eulerAngles;
-			ShowTranslation.Scale = Trans.localScale;
+		public void RecordShowTranslation() {
+			ShowTranslation.Position = trans.localPosition;
+			ShowTranslation.Rotation = trans.localRotation.eulerAngles;
+			ShowTranslation.Scale = trans.localScale;
 		}
 
 		[ContextMenu("Record Hide Translation")]
-		public void RecordHideTranslation () {
-			HideTranslation.Position = Trans.localPosition;
-			HideTranslation.Rotation = Trans.localRotation.eulerAngles;
-			HideTranslation.Scale = Trans.localScale;
+		public void RecordHideTranslation() {
+			HideTranslation.Position = trans.localPosition;
+			HideTranslation.Rotation = trans.localRotation.eulerAngles;
+			HideTranslation.Scale = trans.localScale;
 		}
 
-		void OnValidate () {
-			Trans = GetComponent<Transform>();
+		public override bool Shown() {
+			return 	(TransPosition && trans.localPosition == ShowTranslation.Position)
+			|| (TransRotation && trans.localRotation == ShowTranslation.RotationQ)
+			|| (TransScale && trans.localScale == ShowTranslation.Scale);
 		}
 
-		public override bool Shown () {
-			return 	(TransPosition && Trans.localPosition == ShowTranslation.Position)
-			|| (TransRotation && Trans.localRotation == ShowTranslation.RotationQ)
-			|| (TransScale && Trans.localScale == ShowTranslation.Scale);
+		public override bool Hided() {
+			return 	(TransPosition && trans.localPosition == HideTranslation.Position)
+			|| (TransRotation && trans.localRotation == HideTranslation.RotationQ)
+			|| (TransScale && trans.localScale == HideTranslation.Scale);
 		}
 
-		public override bool Hided () {
-			return 	(TransPosition && Trans.localPosition == HideTranslation.Position)
-			|| (TransRotation && Trans.localRotation == HideTranslation.RotationQ)
-			|| (TransScale && Trans.localScale == HideTranslation.Scale);
+		public override void ForceShow() {
+			if (TransPosition) trans.localPosition = ShowTranslation.Position;
+			if (TransRotation) trans.localRotation = ShowTranslation.RotationQ;
+			if (TransScale) trans.localScale = ShowTranslation.Scale;
 		}
 
-		public override void ForceShow () {
-			if (TransPosition)
-				Trans.localPosition = ShowTranslation.Position;
-			if (TransRotation)
-				Trans.localRotation = ShowTranslation.RotationQ;
-			if (TransScale)
-				Trans.localScale = ShowTranslation.Scale;
-		}
-
-		public override void ForceHide () {
-			if (TransPosition)
-				Trans.localPosition = HideTranslation.Position;
-			if (TransRotation)
-				Trans.localRotation = HideTranslation.RotationQ;
-			if (TransScale)
-				Trans.localScale = HideTranslation.Scale;
+		public override void ForceHide() {
+			if (TransPosition) trans.localPosition = HideTranslation.Position;
+			if (TransRotation) trans.localRotation = HideTranslation.RotationQ;
+			if (TransScale) trans.localScale = HideTranslation.Scale;
 		}
 
 		Vector3 startPosition, endPosition, startScale, endScale;
 		Quaternion startRotation, endRotation;
 
-		public override void PrepareShow () {
-			startPosition = Trans.localPosition;
-			startRotation = Trans.localRotation;
-			startScale = Trans.localScale;
+		public override void PrepareShow() {
+			startPosition = trans.localPosition;
+			startRotation = trans.localRotation;
+			startScale = trans.localScale;
 
 			endPosition = ShowTranslation.Position;
 			endRotation = ShowTranslation.RotationQ;
 			endScale = ShowTranslation.Scale;
 		}
 
-		public override void PrepareHide () {
-			startPosition = Trans.localPosition;
-			startRotation = Trans.localRotation;
-			startScale = Trans.localScale;
+		public override void PrepareHide() {
+			startPosition = trans.localPosition;
+			startRotation = trans.localRotation;
+			startScale = trans.localScale;
 
 			endPosition = HideTranslation.Position;
 			endRotation = HideTranslation.RotationQ;
 			endScale = HideTranslation.Scale;
 		}
 
-		public override void ApplyTransition (float step) {
-			if (TransPosition)
-				Trans.localPosition = Vector3.Lerp(startPosition, endPosition, step);
-			if (TransRotation)
-				Trans.localRotation = Quaternion.Lerp(startRotation, endRotation, step);
-			if (TransScale)
-				Trans.localScale = Vector3.Lerp(startScale, endScale, step);
+		public override void ApplyTransition(float step) {
+			if (TransPosition) trans.localPosition = Vector3.Lerp(startPosition, endPosition, step);
+			if (TransRotation) trans.localRotation = Quaternion.Lerp(startRotation, endRotation, step);
+			if (TransScale) trans.localScale = Vector3.Lerp(startScale, endScale, step);
 		}
 	}
 }

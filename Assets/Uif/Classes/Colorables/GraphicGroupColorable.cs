@@ -7,21 +7,24 @@ namespace Uif {
 		public bool ExcludeSelf = true;
 		public LayerMask ColorableLayers;
 
+		[Space]
 		public Color Color = Color.white;
 
-		Graphic[] graphics;
+		[Space]
+		public Graphic[] graphics;
 
-		void Awake () {
+
+		public void OnValidate() {
 			graphics = GetComponentsInChildren<Graphic>();
 
 			SetColor(Color);
 		}
 
-		public override Color GetColor () {
+		public override Color GetColor() {
 			return Color;
 		}
 
-		public override void SetColor (Color newColor) {
+		public override void SetColor(Color newColor) {
 			foreach (var graphic in graphics) {
 				if (ExcludeSelf && graphic.gameObject == gameObject) continue;
 				if (ColorableLayers == (ColorableLayers & (1 << graphic.gameObject.layer))) continue;

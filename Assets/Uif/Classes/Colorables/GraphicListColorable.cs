@@ -6,19 +6,20 @@ namespace Uif {
 	public class GraphicListColorable : Colorable {
 		public Color Color = Color.white;
 	
-		public Graphic[] graphics;
+		[Space]
+		public Graphic[] Graphics;
 
 
-		void Awake () {
+		public void OnValidate() {
 			SetColor(Color);
 		}
 
-		public override Color GetColor () {
+		public override Color GetColor() {
 			return Color;
 		}
 
-		public override void SetColor (Color newColor) {
-			foreach (var graphic in graphics) {
+		public override void SetColor(Color newColor) {
+			foreach (var graphic in Graphics) {
 				graphic.color = newColor;
 			}
 
