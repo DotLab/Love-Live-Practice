@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: b806422ad964dae4c86f919375475ec2
-timeCreated: 1514616341
+timeCreated: 1514651556
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -17,6 +17,14 @@ TextureImporter:
     21300020: ui-bilinear_4
     21300022: ui-bilinear_5
     21300024: ui-bilinear_6
+    21300026: ui-bilinear_7
+    21300028: ui-bilinear_8
+    21300030: ui-bilinear_9
+    21300032: ui-bilinear_10
+    21300034: ui-bilinear_11
+    21300036: ui-bilinear_12
+    21300038: ui-bilinear_13
+    21300040: ui-bilinear_14
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -91,84 +99,6 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: binia_0
-      rect:
-        serializedVersion: 2
-        x: 1
-        y: 29
-        width: 2
-        height: 1
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: binia_1
-      rect:
-        serializedVersion: 2
-        x: 3
-        y: 29
-        width: 2
-        height: 1
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: binia_2
-      rect:
-        serializedVersion: 2
-        x: 7
-        y: 29
-        width: 1
-        height: 2
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: binia_3
-      rect:
-        serializedVersion: 2
-        x: 7
-        y: 27
-        width: 1
-        height: 2
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: binia_4
-      rect:
-        serializedVersion: 2
-        x: 10
-        y: 28
-        width: 3
-        height: 3
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: binia_5
-      rect:
-        serializedVersion: 2
-        x: 13
-        y: 25
-        width: 6
-        height: 6
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
       name: ui-bilinear_0
       rect:
         serializedVersion: 2
@@ -198,10 +128,10 @@ TextureImporter:
       name: ui-bilinear_2
       rect:
         serializedVersion: 2
-        x: 3
-        y: 23
-        width: 1
-        height: 3
+        x: 1
+        y: 26
+        width: 9
+        height: 1
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -211,10 +141,10 @@ TextureImporter:
       name: ui-bilinear_3
       rect:
         serializedVersion: 2
-        x: 7
-        y: 18
+        x: 5
+        y: 22
         width: 1
-        height: 3
+        height: 9
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -224,22 +154,9 @@ TextureImporter:
       name: ui-bilinear_4
       rect:
         serializedVersion: 2
-        x: 7
-        y: 24
-        width: 3
-        height: 1
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: ui-bilinear_6
-      rect:
-        serializedVersion: 2
         x: 1
-        y: 19
-        width: 3
+        y: 26
+        width: 4
         height: 1
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
@@ -250,13 +167,130 @@ TextureImporter:
       name: ui-bilinear_5
       rect:
         serializedVersion: 2
-        x: 3
-        y: 12
+        x: 6
+        y: 26
+        width: 4
+        height: 1
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: ui-bilinear_6
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 22
         width: 1
         height: 4
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: ui-bilinear_7
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 27
+        width: 1
+        height: 4
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: ui-bilinear_8
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 22
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: ui-bilinear_9
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 27
+        width: 9
+        height: 4
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: ui-bilinear_10
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 22
+        width: 9
+        height: 4
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: ui-bilinear_11
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 22
+        width: 4
+        height: 9
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: ui-bilinear_12
+      rect:
+        serializedVersion: 2
+        x: 6
+        y: 22
+        width: 4
+        height: 9
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: ui-bilinear_13
+      rect:
+        serializedVersion: 2
+        x: 30
+        y: 1
+        width: 1
+        height: 1
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: ui-bilinear_14
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 1
+        width: 19
+        height: 19
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 9, y: 9, z: 9, w: 9}
       outline: []
       tessellationDetail: 0
     outline: []
