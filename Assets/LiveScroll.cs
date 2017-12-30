@@ -1,4 +1,7 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
+
+using Uif;
 
 using LoveLivePractice.Api;
 
@@ -10,10 +13,29 @@ namespace LoveLivePractice.Unity {
 		public float ItemHeight = 70, ItemSpacing = 2, ItemMinWidth = 360, ItemMaxWidth = 480;
 		public int Limit = 24, CurrentPage = 0;
 
+		public EasingType EasingType = EasingType.Cubic;
+
 		public RectTransform contentRectTrans;
+		public ScrollRect uiScrollRect;
+
+		public int visibleItemCount;
+
+		public void OnValidate() {
+			uiScrollRect = GetComponent<ScrollRect>();
+		}
 
 		public void Start() {
 			ChangePage();
+
+			visibleItemCount = (int)(CanvasSizer.GetCanvasHeight() * 0.5f / (ItemHeight + ItemSpacing) + 1);
+		}
+
+		public void OnEnable() {
+			uiScrollRect.onValueChanged.AddListener(OnValueChanged);
+		}
+
+		public void OnDisable() {
+			uiScrollRect.onValueChanged.RemoveListener(OnValueChanged);
 		}
 
 		[ContextMenu("BuildItems")]
@@ -50,6 +72,19 @@ namespace LoveLivePractice.Unity {
 				var item = response.content.items[i];
 
 				Items[i].Init(item.live_name, item.artist + " // " + item.upload_user.username, item.category.name, item.level);
+			}
+		}
+
+		public void OnValueChanged(Vector2 value) {
+			float position = contentRectTrans.anchoredPosition.y / (ItemHeight + ItemSpacing);
+			int index = (int)position + 1;
+
+			for (int i = Mathf.Max(0, index - visibleItemCount); i < Mathf.Min(Limit, index + visibleItemCount); i++) {
+				float itemPosition = i;
+				float step = 1 - (Mathf.Abs(itemPosition - position) / visibleItemCount);
+				step = Easing.EaseOut(step, EasingType);
+				Items[i].Width = ItemMinWidth + step * (ItemMaxWidth - ItemMinWidth);
+				//Items[i].Init(itemPosition.ToString(), (position - itemPosition).ToString(), step.ToString(), 0);
 			}
 		}
 	}

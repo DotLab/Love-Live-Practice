@@ -32,7 +32,7 @@ namespace LoveLivePractice {
 
 			switch (type) {
 				case LogType.Log:
-					lines.Add(string.Format("{0}\n\t{1}\n", logString, stack));
+					lines.Add(string.Format("{0}\n", logString));
 					break;
 				case LogType.Warning:
 					lines.Add(string.Format("<color=yellow>{0}</color>\n\t{1}\n", logString, stack));
