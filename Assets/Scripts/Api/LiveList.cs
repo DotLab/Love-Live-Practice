@@ -17,17 +17,10 @@
 		public int click_count, level;
 		public bool memberonly;
 		public LiveListItemUser upload_user;
-		public LiveListItemCategory category;
 	}
 
 	[System.Serializable]
 	public class LiveListItemUser {
 		public string username;
-	}
-
-	[System.Serializable]
-	public class LiveListItemCategory {
-		public int id;
-		public string name;
 	}
 }

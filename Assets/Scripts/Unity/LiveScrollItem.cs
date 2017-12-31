@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
+using Uif;
+
 namespace LoveLivePractice.Unity {
 	public class LiveScrollItem : MonoBehaviour {
 		public float Width {
@@ -16,17 +18,24 @@ namespace LoveLivePractice.Unity {
 		public RectTransform rectTrans, coverUiRawImageRectTrans;
 		public RawImage coverUiRawImage;
 		public Text titleUiText, authorUiText, tagUiText, starsUiText;
+		public ColorableSwapable backgroundColorable, textColorable;
+		public RectClipHidable coverClipHidable;
 
 		public void OnValidate() {
 			rectTrans = GetComponent<RectTransform>();
 			if (coverUiRawImage != null) coverUiRawImageRectTrans = coverUiRawImage.GetComponent<RectTransform>();
 		}
 
-		public void Init(Texture texture) {
+		public void Init(Texture2D texture) {
+			var ct = new ColorThiefDotNet.ColorThief();
+			var qColor = ct.GetColor(texture);
+			backgroundColorable.Swap(qColor.Color.ToUnityColor());
+
+			if (qColor.IsDark) textColorable.Swap(Color.white);
+
 			coverUiRawImage.texture = texture;
-			coverUiRawImageRectTrans.sizeDelta = new Vector2(
-				(float)texture.width / texture.height * rectTrans.sizeDelta.y, 
-				rectTrans.sizeDelta.y);
+			coverClipHidable.ShowWidth = (float)texture.width / texture.height * rectTrans.sizeDelta.y;
+			coverClipHidable.Show();
 		}
 
 		public void Init(string title, string author, string tag, int stars) {

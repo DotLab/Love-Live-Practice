@@ -4,6 +4,7 @@ using System.Collections;
 namespace Uif {
 	public abstract class EasedHidable : Hidable {
 		public EasingType TransitionEasingType = EasingType.Cubic;
+		public EasingPhase TransitionEasingPhase = EasingPhase.InOut;
 		public float TransitionDuration = 0.5f;
 	
 		public override void Show() {
@@ -28,7 +29,7 @@ namespace Uif {
 			float time = 0;
 
 			while (time < TransitionDuration) {
-				var easedStep = Easing.EaseInOut(time / TransitionDuration, TransitionEasingType);
+				var easedStep = Easing.Ease(TransitionEasingType, TransitionEasingPhase, time, TransitionDuration);
 
 				ApplyTransition(easedStep);
 

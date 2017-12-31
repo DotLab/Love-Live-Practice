@@ -38,7 +38,7 @@ namespace Uif {
 			TransitionImage.color = SetAlpha(MainImage.color, 0);
 
 			while (time < TransitionDuration) {
-				var easedStep = Easing.EaseInOut(time / TransitionDuration, TransitionEasingType);
+				var easedStep = Easing.Ease(TransitionEasingType, TransitionEasingPhase, time, TransitionDuration);
 
 				MainImage.color = SetAlpha(MainImage.color, srcAlpha - srcAlpha * easedStep);
 				TransitionImage.color = SetAlpha(MainImage.color, easedStep);

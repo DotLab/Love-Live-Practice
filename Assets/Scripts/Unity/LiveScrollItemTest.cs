@@ -2,7 +2,7 @@
 
 namespace LoveLivePractice.Unity {
 	public class LiveScrollItemTest : MonoBehaviour {
-		public Texture Texture;
+		public Texture2D Texture;
 		public string Title = "[創作譜面]近未来ハッピーエンド", Author = "Aqours // gytjhkj", Tag = "TECHNICAL";
 		public int Stars = 11;
 

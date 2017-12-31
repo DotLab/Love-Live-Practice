@@ -29,7 +29,7 @@ namespace Uif {
 			float time = 0;
 
 			while (time < TransitionDuration) {
-				var easedStep = Easing.EaseInOut(time / TransitionDuration, TransitionEasingType);
+				var easedStep = Easing.Ease(TransitionEasingType, TransitionEasingPhase, time, TransitionDuration);
 
 				colorable.SetColor(Color.Lerp(srcColor, dstColor, easedStep));
 
