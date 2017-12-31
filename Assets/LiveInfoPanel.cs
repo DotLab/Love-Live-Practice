@@ -13,6 +13,7 @@ public class LiveInfoPanel : MonoBehaviour {
 	public RawImage bgUiRawImage;
 	public AspectRatioFitter bgFitter;
 	public EasedHidable bgHidable;
+	public AudioSource MainSource;
 
 	public TextSwapable titleText, uploaderText, songInfoText, mapInfoText, playerInfoText;
 
@@ -55,5 +56,17 @@ public class LiveInfoPanel : MonoBehaviour {
 		var map = JsonUtility.FromJson<Map>(Map.Transform(json));
 		LiveMap = map;
 		mapInfoText.Swap(string.Format("Notes: {0:N0} Long: {1:N0} Parallel: {2:N0}", map.lane.Length, map.lane.Count(a => a.longnote), map.lane.Count(a => a.parallel)));
+
+		www = new WWW(UrlBuilder.GetCachedUploadUrl(live.bgm_path));
+		yield return www;
+		if (!string.IsNullOrEmpty(www.error)) Debug.LogError(www.error);
+		if (!System.IO.File.Exists(Application.persistentDataPath + "/" + live.bgm_path)) System.IO.File.WriteAllBytes(Application.persistentDataPath + "/" + live.bgm_path, www.bytes);
+
+		var clip = www.GetAudioClip();
+		MainSource.Stop();
+		yield return new WaitForSeconds(0.1f);
+
+		MainSource.clip = clip;
+		MainSource.Play();
 	}
 }
