@@ -6,6 +6,19 @@ using Texture2D = UnityEngine.Texture2D;
 
 namespace ColorThiefDotNet {
 	public partial class ColorThief {
+		public static QuantizedColor GetColorFromPalette(List<QuantizedColor> palette) {
+			return new QuantizedColor(new Color {
+				A = Convert.ToByte(palette.Average(a => a.Color.A)),
+				R = Convert.ToByte(palette.Average(a => a.Color.R)),
+				G = Convert.ToByte(palette.Average(a => a.Color.G)),
+				B = Convert.ToByte(palette.Average(a => a.Color.B))
+			}, Convert.ToInt32(palette.Average(a => a.Population)));
+		}
+
+		public static UnityEngine.Color[] GetUnityColorsFromPalette(List<QuantizedColor> palette) {
+			return palette.Select(qColor => qColor.Color.ToUnityColor()).ToArray();
+		}
+
 		/// <summary>
 		///     Use the median cut algorithm to cluster similar colors and return the base color from the largest cluster.
 		/// </summary>
@@ -21,14 +34,7 @@ namespace ColorThiefDotNet {
 		public QuantizedColor GetColor(Texture2D sourceImage, int quality = DefaultQuality, bool ignoreWhite = DefaultIgnoreWhite) {
 			var palette = GetPalette(sourceImage, DefaultColorCount, quality, ignoreWhite);
 
-			var dominantColor = new QuantizedColor(new Color {
-				A = Convert.ToByte(palette.Average(a => a.Color.A)),
-				R = Convert.ToByte(palette.Average(a => a.Color.R)),
-				G = Convert.ToByte(palette.Average(a => a.Color.G)),
-				B = Convert.ToByte(palette.Average(a => a.Color.B))
-			}, Convert.ToInt32(palette.Average(a => a.Population)));
-
-			return dominantColor;
+			return GetColorFromPalette(palette);
 		}
 
 		/// <summary>

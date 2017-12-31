@@ -11,10 +11,13 @@ public class LiveInfoPanel : MonoBehaviour {
 	public Map LiveMap;
 	public LiveListItem Item;
 
+	public Color[] Colors;
+
 	public RawImage bgUiRawImage;
 	public AspectRatioFitter bgFitter;
 	public EasedHidable bgHidable;
 	public AudioSource MainSource;
+	public MapPreviewPanel mapPreviewPanel;
 
 	public TextSwapable titleText, uploaderText, songInfoText, mapInfoText, playerInfoText;
 
@@ -61,6 +64,12 @@ public class LiveInfoPanel : MonoBehaviour {
 		string json = www.text;
 		var map = JsonUtility.FromJson<Map>(Map.Transform(json));
 		LiveMap = map;
+		System.Array.Sort(LiveMap.lane);
+		foreach (var note in LiveMap.lane) {
+			note.starttime /= 1000;
+			note.endtime /= 1000;
+		}
+
 		mapInfoText.Swap(string.Format("Notes: {0:N0} Long: {1:N0} Parallel: {2:N0}", map.lane.Length, map.lane.Count(a => a.longnote), map.lane.Count(a => a.parallel)));
 
 		www = new WWW(UrlBuilder.GetCachedUploadUrl(live.bgm_path));
@@ -73,6 +82,8 @@ public class LiveInfoPanel : MonoBehaviour {
 		yield return new WaitForSeconds(0.1f);
 
 		MainSource.clip = clip;
-		MainSource.Play();
+		mapPreviewPanel.Colors = Colors;
+		mapPreviewPanel.Init(LiveMap, MainSource);
+		mapPreviewPanel.Play();
 	}
 }

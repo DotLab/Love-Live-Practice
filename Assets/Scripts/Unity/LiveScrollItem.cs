@@ -21,6 +21,8 @@ namespace LoveLivePractice.Unity {
 		public LiveListItem Item;
 		public LiveScroll Scroll;
 
+		public Color[] Colors;
+
 		public RectTransform rectTrans, coverUiRawImageRectTrans;
 		public RawImage coverUiRawImage;
 		public Text titleUiText, authorUiText, tagUiText, starsUiText;
@@ -44,7 +46,9 @@ namespace LoveLivePractice.Unity {
 			Texture.LoadImage(bytes);
 
 			var ct = new ColorThiefDotNet.ColorThief();
-			var qColor = ct.GetColor(Texture);
+			var palette = ct.GetPalette(Texture);
+			var qColor = ColorThiefDotNet.ColorThief.GetColorFromPalette(palette);
+			Colors = ColorThiefDotNet.ColorThief.GetUnityColorsFromPalette(palette);
 			backgroundColorable.Swap(qColor.Color.ToUnityColor());
 
 			if (qColor.IsDark) textColorable.Swap(Color.white);

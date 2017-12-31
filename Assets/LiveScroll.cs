@@ -121,6 +121,7 @@ namespace LoveLivePractice.Unity {
 
 		public void OnItemPressed(LiveScrollItem item) {
 			liveInfoPanel.ChangeLive(item.Texture, item.Item);
+			liveInfoPanel.Colors = item.Colors;
 		}
 	}
 }

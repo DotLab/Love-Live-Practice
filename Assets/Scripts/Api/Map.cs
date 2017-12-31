@@ -18,9 +18,13 @@ namespace LoveLivePractice.Api {
 	}
 
 	[System.Serializable]
-	public class Note {
+	public class Note : System.IComparable<Note> {
 		public int lane;
 		public double starttime, endtime;
 		public bool longnote, parallel, hold;
+
+		public int CompareTo(Note other) {
+			return starttime.CompareTo(other.starttime);
+		}
 	}
 }
