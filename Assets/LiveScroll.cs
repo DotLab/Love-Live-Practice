@@ -20,6 +20,8 @@ namespace LoveLivePractice.Unity {
 		public ScrollRect uiScrollRect;
 		public Hidable hidable;
 
+		public LiveInfoPanel liveInfoPanel;
+
 		int visibleItemCount;
 		bool dirty = true;
 
@@ -47,14 +49,6 @@ namespace LoveLivePractice.Unity {
 			}
 		}
 
-		public void OnEnable() {
-			uiScrollRect.onValueChanged.AddListener(OnValueChanged);
-		}
-		
-		public void OnDisable() {
-			uiScrollRect.onValueChanged.RemoveListener(OnValueChanged);
-		}
-
 		[ContextMenu("BuildItems")]
 		public void BuildItems() {
 			if (contentRectTrans.childCount != 0) return;
@@ -66,6 +60,8 @@ namespace LoveLivePractice.Unity {
 
 				item.Width = ItemMinWidth;
 				item.Y = -i * (ItemHeight + ItemSpacing);
+
+				item.Init(this);
 			}
 
 			contentRectTrans.sizeDelta = new Vector2(contentRectTrans.sizeDelta.x, (ItemHeight + ItemSpacing) * Limit - ItemSpacing);
@@ -89,7 +85,7 @@ namespace LoveLivePractice.Unity {
 			var items = response.content.items;
 
 			for (int i = 0; i < response.content.items.Length; i++) {
-				Items[i].Init(items[i].live_name, items[i].artist + " // " + items[i].upload_user.username, string.Format("{0:N0} (LEVEL{1:N0})", items[i].click_count, items[i].level), items[i].level);
+				Items[i].Init(items[i]);
 			}
 
 			hidable.Show();
@@ -121,6 +117,10 @@ namespace LoveLivePractice.Unity {
 
 		public void OnValueChanged(Vector2 value) {
 			dirty = true;
+		}
+
+		public void OnItemPressed(LiveScrollItem item) {
+			liveInfoPanel.ChangeLive(item.Texture, item.Item);
 		}
 	}
 }

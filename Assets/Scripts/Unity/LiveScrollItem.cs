@@ -3,6 +3,8 @@ using UnityEngine.UI;
 
 using Uif;
 
+using LoveLivePractice.Api;
+
 namespace LoveLivePractice.Unity {
 	public class LiveScrollItem : MonoBehaviour {
 		public float Width {
@@ -16,6 +18,8 @@ namespace LoveLivePractice.Unity {
 		}
 
 		public Texture2D Texture;
+		public LiveListItem Item;
+		public LiveScroll Scroll;
 
 		public RectTransform rectTrans, coverUiRawImageRectTrans;
 		public RawImage coverUiRawImage;
@@ -32,6 +36,10 @@ namespace LoveLivePractice.Unity {
 			coverUiRawImage.texture = Texture = new Texture2D(4, 4);
 		}
 
+		public void Init(LiveScroll scroll) {
+			Scroll = scroll;
+		}
+
 		public void Init(byte[] bytes) {
 			Texture.LoadImage(bytes);
 
@@ -46,15 +54,21 @@ namespace LoveLivePractice.Unity {
 			coverClipHidable.Show();
 		}
 
-		public void Init(string title, string author, string tag, int stars) {
-			titleUiText.text = title;
-			authorUiText.text = author;
-			tagUiText.text = tag;
+		public void Init(LiveListItem item) {
+			Item = item;
+
+			titleUiText.text = item.live_name;
+			authorUiText.text = item.artist + " // " + item.upload_user.username;
+			tagUiText.text = string.Format("{0:N0} [LEVEL{1:N0}]", item.click_count, item.level);
 
 			string starsText = "";
-			for (int i = 0; i < stars; i++) starsText += "★ ";
-			for (int i = stars; i < 14; i++) starsText += "☆ ";
+			for (int i = 0; i < item.level; i++) starsText += "★ ";
+			for (int i = item.level; i < 14; i++) starsText += "☆ ";
 			starsUiText.text = starsText;
+		}
+
+		public void OnButtonPressed() {
+			Scroll.OnItemPressed(this);
 		}
 	}
 }
