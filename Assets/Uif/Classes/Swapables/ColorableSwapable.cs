@@ -4,7 +4,7 @@ using System.Collections;
 namespace Uif {
 	[AddComponentMenu("Uif/Swapable/Colorable Swapable")]
 	[RequireComponent(typeof(Colorable))]
-	public class ColorableSwapable : ColorSwapable {
+	public class ColorableSwapable : EasedColorSwapable {
 		public Colorable colorable;
 
 		Color lastColor;
@@ -13,30 +13,28 @@ namespace Uif {
 			colorable = GetComponent<Colorable>();
 		}
 
-		public override void Swap(Color newColor) {
-			if (colorable.GetColor() == newColor && lastColor == newColor) return;
-			lastColor = newColor;
-
-			StopAllCoroutines();
-			StartCoroutine(SwapHandler(colorable.GetColor(), newColor));
+		protected override bool NeedTransition(Color newItem) {
+			return colorable.GetColor() != newItem || lastColor != newItem;
 		}
 
-		public override void ForceSwap(Color newColor) {
-			colorable.SetColor(newColor);
+		public override void ForceSwap(Color newItem) {
+			colorable.SetColor(newItem);
 		}
 
-		IEnumerator SwapHandler(Color srcColor, Color dstColor) {
-			float time = 0;
+		Color srcColor, dstColor;
 
-			while (time < TransitionDuration) {
-				var easedStep = Easing.Ease(TransitionEasingType, TransitionEasingPhase, time, TransitionDuration);
+		protected override void PrepareTransition(Color newItem) {
+			lastColor = newItem;
 
-				colorable.SetColor(Color.Lerp(srcColor, dstColor, easedStep));
+			srcColor = colorable.GetColor();
+			dstColor = newItem;
+		}
 
-				time += Time.deltaTime;
-				yield return null;
-			}
+		protected override void ApplyTransition(float t) {
+			colorable.SetColor(Color.Lerp(srcColor, dstColor, t));
+		}
 
+		protected override void FinishTransition() {
 			colorable.SetColor(dstColor);
 		}
 	}

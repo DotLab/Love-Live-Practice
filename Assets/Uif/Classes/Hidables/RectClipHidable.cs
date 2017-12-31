@@ -5,12 +5,12 @@ namespace Uif {
 	public class RectClipHidable : EasedHidable {
 		public bool LockWidth;
 		public float ShowWidth;
-		public float HideHeight;
+		public float HideWidth;
 
 		[Space]
 		public bool LockHeight;
 		public float ShowHeight;
-		public float HideWidth;
+		public float HideHeight;
 
 		[Space]
 		public RectTransform rect;

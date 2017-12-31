@@ -5,7 +5,7 @@ using System.Collections;
 namespace Uif {
 	[AddComponentMenu("Uif/Swapable/Image Swapable")]
 	[RequireComponent(typeof(Image))]
-	public class ImageSwapable : SpriteSwapable {
+	public class ImageSwapable : EasedSpriteSwapable {
 		public Image MainImage;
 		public Image TransitionImage;
 
@@ -15,38 +15,42 @@ namespace Uif {
 			if (TransitionImage == null) TransitionImage = transform.Find("Transition").GetComponent<Image>();
 		}
 
-		public override void Swap(Sprite newSprite) {
-			if ((MainImage.sprite == newSprite && TransitionImage.sprite == null) || (newSprite != null && TransitionImage.sprite == newSprite)) return;
-
-			StopAllCoroutines();
-			if (TransitionImage.sprite != null) StartCoroutine(SwapHandler(TransitionImage.sprite, TransitionImage.color.a, newSprite));
-			else StartCoroutine(SwapHandler(MainImage.sprite, MainImage.color.a, newSprite));
+		protected override bool NeedTransition(Sprite newItem) {
+			return !((MainImage.sprite == newItem && TransitionImage.sprite == null) || (newItem != null && TransitionImage.sprite == newItem));
 		}
 
-		public override void ForceSwap(Sprite newSprite) {
-			if ((MainImage.sprite == newSprite && TransitionImage.sprite == null) || (newSprite != null && TransitionImage.sprite == newSprite)) return;
+		public override void ForceSwap(Sprite newItem) {
+			if (!NeedTransition(newItem)) return;
 
-			MainImage.sprite = newSprite;
+			MainImage.sprite = newItem;
 		}
 
-		IEnumerator SwapHandler(Sprite srcSprite, float srcAlpha, Sprite dstSprite) {
-			float time = 0;
+		Sprite srcSprite, dstSprite;
+		float srcAlpha;
+
+		protected override void PrepareTransition(Sprite newItem) {
+			if (TransitionImage.sprite != null) {
+				srcSprite = TransitionImage.sprite;
+				srcAlpha = TransitionImage.color.a;
+			} else {
+				srcSprite = MainImage.sprite;
+				srcAlpha = MainImage.color.a;
+			}
+
+			dstSprite = newItem;
 
 			MainImage.sprite = srcSprite;
 			MainImage.color = SetAlpha(MainImage.color, srcAlpha);
 			TransitionImage.sprite = dstSprite;
 			TransitionImage.color = SetAlpha(MainImage.color, 0);
+		}
 
-			while (time < TransitionDuration) {
-				var easedStep = Easing.Ease(TransitionEasingType, TransitionEasingPhase, time, TransitionDuration);
+		protected override void ApplyTransition(float t) {
+			MainImage.color = SetAlpha(MainImage.color, srcAlpha - srcAlpha * t);
+			TransitionImage.color = SetAlpha(MainImage.color, t);
+		}
 
-				MainImage.color = SetAlpha(MainImage.color, srcAlpha - srcAlpha * easedStep);
-				TransitionImage.color = SetAlpha(MainImage.color, easedStep);
-
-				time += Time.deltaTime;
-				yield return null;
-			}
-
+		protected override void FinishTransition() {
 			MainImage.sprite = dstSprite;
 			MainImage.color = SetAlpha(MainImage.color, 1);
 			TransitionImage.sprite = null;
