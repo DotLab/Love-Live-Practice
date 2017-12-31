@@ -108,10 +108,10 @@ namespace LoveLivePractice.Unity {
 				Items[i + 2].Init(www3.bytes);
 				Items[i + 3].Init(www4.bytes);
 
-				System.IO.File.WriteAllBytes(Application.persistentDataPath + "/" + items[i].cover_path, www1.bytes);
-				System.IO.File.WriteAllBytes(Application.persistentDataPath + "/" + items[i + 1].cover_path, www2.bytes);
-				System.IO.File.WriteAllBytes(Application.persistentDataPath + "/" + items[i + 2].cover_path, www3.bytes);
-				System.IO.File.WriteAllBytes(Application.persistentDataPath + "/" + items[i + 3].cover_path, www4.bytes);
+				if (!System.IO.File.Exists(Application.persistentDataPath + "/" + items[i].cover_path)) System.IO.File.WriteAllBytes(Application.persistentDataPath + "/" + items[i].cover_path, www1.bytes);
+				if (!System.IO.File.Exists(Application.persistentDataPath + "/" + items[i + 1].cover_path)) System.IO.File.WriteAllBytes(Application.persistentDataPath + "/" + items[i + 1].cover_path, www2.bytes);
+				if (!System.IO.File.Exists(Application.persistentDataPath + "/" + items[i + 2].cover_path)) System.IO.File.WriteAllBytes(Application.persistentDataPath + "/" + items[i + 2].cover_path, www3.bytes);
+				if (!System.IO.File.Exists(Application.persistentDataPath + "/" + items[i + 3].cover_path)) System.IO.File.WriteAllBytes(Application.persistentDataPath + "/" + items[i + 3].cover_path, www4.bytes);
 			}
 		}
 

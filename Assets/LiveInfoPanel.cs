@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,6 +8,8 @@ using Uif;
 using LoveLivePractice.Api;
 
 public class LiveInfoPanel : MonoBehaviour {
+	public Map LiveMap;
+
 	public RawImage bgUiRawImage;
 	public AspectRatioFitter bgFitter;
 	public EasedHidable bgHidable;
@@ -39,14 +41,19 @@ public class LiveInfoPanel : MonoBehaviour {
 		var response = JsonUtility.FromJson<LiveResponse>(www.text);
 		var live = response.content;
 
-		songInfoText.Swap(string.Format("Category: {0} Likes: {1:N0} Clicks: {2:N0}", live.category.name, live.like_count, live.click_count));
+		songInfoText.Swap(string.Format("Category: {0} Likes: {1:N0} Played: {2:N0}", live.category.name, live.like_count, live.click_count));
 		playerInfoText.Swap(live.live_info);
+
+		yield return new WaitForSeconds(playerInfoText.TransitionDuration + 0.1f);
 
 		www = new WWW(UrlBuilder.GetCachedUploadUrl(live.map_path));
 		yield return www;
 		if (!string.IsNullOrEmpty(www.error)) Debug.LogError(www.error);
-		System.IO.File.WriteAllBytes(Application.persistentDataPath + "/" + live.map_path, www.bytes);
+		if (!System.IO.File.Exists(Application.persistentDataPath + "/" + live.map_path)) System.IO.File.WriteAllBytes(Application.persistentDataPath + "/" + live.map_path, www.bytes);
 
-		Debug.Log(www.text);
+		string json = www.text;
+		var map = JsonUtility.FromJson<Map>(Map.Transform(json));
+		LiveMap = map;
+		mapInfoText.Swap(string.Format("Notes: {0:N0} Long: {1:N0} Parallel: {2:N0}", map.lane.Length, map.lane.Count(a => a.longnote), map.lane.Count(a => a.parallel)));
 	}
 }
