@@ -95,10 +95,10 @@ namespace LoveLivePractice.Unity {
 			hidable.Show();
 
 			for (int i = 0; i < response.content.items.Length; i += 4) {
-				var www1 = new WWW(UrlBuilder.GetUploadUrl(items[i].cover_path));
-				var www2 = new WWW(UrlBuilder.GetUploadUrl(items[i + 1].cover_path));
-				var www3 = new WWW(UrlBuilder.GetUploadUrl(items[i + 2].cover_path));
-				var www4 = new WWW(UrlBuilder.GetUploadUrl(items[i + 3].cover_path));
+				var www1 = new WWW(UrlBuilder.GetCachedUploadUrl(items[i].cover_path));
+				var www2 = new WWW(UrlBuilder.GetCachedUploadUrl(items[i + 1].cover_path));
+				var www3 = new WWW(UrlBuilder.GetCachedUploadUrl(items[i + 2].cover_path));
+				var www4 = new WWW(UrlBuilder.GetCachedUploadUrl(items[i + 3].cover_path));
 
 				yield return www1;
 				yield return www2;
@@ -106,11 +106,16 @@ namespace LoveLivePractice.Unity {
 				yield return www4;
 
 				if (!string.IsNullOrEmpty(www.error)) Debug.LogError(www.error);
-				Items[i].Init(www1.texture);
 
-				Items[i + 1].Init(www2.texture);
-				Items[i + 2].Init(www3.texture);
-				Items[i + 3].Init(www4.texture);
+				Items[i].Init(www1.bytes);
+				Items[i + 1].Init(www2.bytes);
+				Items[i + 2].Init(www3.bytes);
+				Items[i + 3].Init(www4.bytes);
+
+				System.IO.File.WriteAllBytes(Application.persistentDataPath + "/" + items[i].cover_path, www1.bytes);
+				System.IO.File.WriteAllBytes(Application.persistentDataPath + "/" + items[i + 1].cover_path, www2.bytes);
+				System.IO.File.WriteAllBytes(Application.persistentDataPath + "/" + items[i + 2].cover_path, www3.bytes);
+				System.IO.File.WriteAllBytes(Application.persistentDataPath + "/" + items[i + 3].cover_path, www4.bytes);
 			}
 		}
 

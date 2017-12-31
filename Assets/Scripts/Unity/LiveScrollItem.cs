@@ -15,6 +15,8 @@ namespace LoveLivePractice.Unity {
 			set { rectTrans.anchoredPosition = new Vector2(rectTrans.anchoredPosition.x, value); }
 		}
 
+		public Texture2D Texture;
+
 		public RectTransform rectTrans, coverUiRawImageRectTrans;
 		public RawImage coverUiRawImage;
 		public Text titleUiText, authorUiText, tagUiText, starsUiText;
@@ -26,15 +28,21 @@ namespace LoveLivePractice.Unity {
 			if (coverUiRawImage != null) coverUiRawImageRectTrans = coverUiRawImage.GetComponent<RectTransform>();
 		}
 
-		public void Init(Texture2D texture) {
+		public void Start() {
+			coverUiRawImage.texture = Texture = new Texture2D(4, 4);
+		}
+
+		public void Init(byte[] bytes) {
+			Texture.LoadImage(bytes);
+
 			var ct = new ColorThiefDotNet.ColorThief();
-			var qColor = ct.GetColor(texture);
+			var qColor = ct.GetColor(Texture);
 			backgroundColorable.Swap(qColor.Color.ToUnityColor());
 
 			if (qColor.IsDark) textColorable.Swap(Color.white);
 
-			coverUiRawImage.texture = texture;
-			coverClipHidable.ShowWidth = (float)texture.width / texture.height * rectTrans.sizeDelta.y;
+			coverUiRawImage.texture = Texture;
+			coverClipHidable.ShowWidth = (float)Texture.width / Texture.height * rectTrans.sizeDelta.y;
 			coverClipHidable.Show();
 		}
 

@@ -18,6 +18,14 @@
 		public static string GetUploadUrl(string path) {
 			return UploadBaseUrl + path;
 		}
+
+		public static string GetCachedUploadUrl(string path) {
+			if (System.IO.File.Exists(UnityEngine.Application.persistentDataPath + "/" + path)) {
+				return "file:///" + UnityEngine.Application.persistentDataPath + "/" + path;
+			}
+
+			return GetUploadUrl(path);
+		}
 	}
 }
 

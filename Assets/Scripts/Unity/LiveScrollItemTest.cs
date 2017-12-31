@@ -8,7 +8,7 @@ namespace LoveLivePractice.Unity {
 
 		public void OnValidate() {
 			GetComponent<LiveScrollItem>().Init(Title, Author, Tag, Stars);
-			if (Texture != null) GetComponent<LiveScrollItem>().Init(Texture);
+			if (Texture != null) GetComponent<LiveScrollItem>().Init(Texture.GetRawTextureData());
 
 			GetComponent<LiveScrollItem>().Width = 360;
 		}
