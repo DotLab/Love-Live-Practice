@@ -30,5 +30,23 @@ public class LiveInfoPanel : MonoBehaviour {
 		bgFitter.aspectRatio = (float)texture.width / texture.height;
 	
 		bgHidable.Show();
+
+		var www = new WWW(UrlBuilder.GetLiveUrl(liveListItem.live_id));
+
+		yield return www;
+		if (!string.IsNullOrEmpty(www.error)) Debug.LogError(www.error);
+
+		var response = JsonUtility.FromJson<LiveResponse>(www.text);
+		var live = response.content;
+
+		songInfoText.Swap(string.Format("Category: {0} Likes: {1:N0} Clicks: {2:N0}", live.category.name, live.like_count, live.click_count));
+		playerInfoText.Swap(live.live_info);
+
+		www = new WWW(UrlBuilder.GetCachedUploadUrl(live.map_path));
+		yield return www;
+		if (!string.IsNullOrEmpty(www.error)) Debug.LogError(www.error);
+		System.IO.File.WriteAllBytes(Application.persistentDataPath + "/" + live.map_path, www.bytes);
+
+		Debug.Log(www.text);
 	}
 }
