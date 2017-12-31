@@ -9,6 +9,7 @@ using LoveLivePractice.Api;
 
 public class LiveInfoPanel : MonoBehaviour {
 	public Map LiveMap;
+	public LiveListItem Item;
 
 	public RawImage bgUiRawImage;
 	public AspectRatioFitter bgFitter;
@@ -18,6 +19,11 @@ public class LiveInfoPanel : MonoBehaviour {
 	public TextSwapable titleText, uploaderText, songInfoText, mapInfoText, playerInfoText;
 
 	public void ChangeLive(Texture2D texture, LiveListItem liveListItem) {
+		if (Item == liveListItem) return;
+		Item = liveListItem;
+
+		StopAllCoroutines();
+
 		StartCoroutine(ChangeLiveHandler(texture, liveListItem));
 	}
 
