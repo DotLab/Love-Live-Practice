@@ -24,6 +24,8 @@ namespace LoveLivePractice.Unity {
 
 		public interface IWwwLoadJob {
 			void StartDownload();
+			void FinishDownload();
+
 			float GetProgress();
 			bool IsFinished();
 		}
@@ -54,16 +56,24 @@ namespace LoveLivePractice.Unity {
 
 			protected readonly string path, url, filePath;
 
-			public WwwLoadJob(string path, string url, string filePath) {
+			protected readonly System.Action<ILoadJob<T>> callback;
+
+			public WwwLoadJob(string path, string url, string filePath, System.Action<ILoadJob<T>> callback) {
 				this.path = path;
 				this.url = url;
 				this.filePath = filePath;
+
+				this.callback = callback;
 
 				WwwLoadJobQueue.AddFirst(this);
 			}
 
 			public void StartDownload() {
 				www = new WWW(url);
+			}
+
+			public void FinishDownload() {
+				if (callback != null) callback(this);
 			}
 
 			public float GetProgress() {
@@ -77,6 +87,8 @@ namespace LoveLivePractice.Unity {
 			}
 
 			public T GetData() {
+				if (!IsFinished()) throw new System.Exception("Job not finished!");
+
 				if (data != null) return data;
 				File.WriteAllBytes(GetCacheFilePath(path), www.bytes);
 				return data = LoadData();
@@ -86,7 +98,7 @@ namespace LoveLivePractice.Unity {
 		}
 
 		public class WwwLoadTextureJob : WwwLoadJob<Texture2D> {
-			public WwwLoadTextureJob(string path, string url, string filePath) : base(path, url, filePath) {
+			public WwwLoadTextureJob(string path, string url, string filePath, System.Action<ILoadJob<Texture2D>> callback) : base(path, url, filePath, callback) {
 			}
 
 			protected override Texture2D LoadData() {
@@ -97,7 +109,7 @@ namespace LoveLivePractice.Unity {
 		}
 
 		public class WwwLoadAudioClipJob : WwwLoadJob<AudioClip> {
-			public WwwLoadAudioClipJob(string path, string url, string filePath) : base(path, url, filePath) {
+			public WwwLoadAudioClipJob(string path, string url, string filePath, System.Action<ILoadJob<AudioClip>> callback) : base(path, url, filePath, callback) {
 			}
 
 			protected override AudioClip LoadData() {
@@ -108,7 +120,7 @@ namespace LoveLivePractice.Unity {
 		}
 
 		public class WwwLoadTextJob : WwwLoadJob<string> {
-			public WwwLoadTextJob(string path, string url, string filePath) : base(path, url, filePath) {
+			public WwwLoadTextJob(string path, string url, string filePath, System.Action<ILoadJob<string>> callback) : base(path, url, filePath, callback) {
 			}
 
 			protected override string LoadData() {
@@ -118,9 +130,11 @@ namespace LoveLivePractice.Unity {
 			}
 		}
 
-		public static ILoadJob<Texture2D> LoadTexture(string path) {
+		public static ILoadJob<Texture2D> LoadTexture(string path, System.Action<ILoadJob<Texture2D>> callback = null) {
 			if (TextureDict.ContainsKey(path)) {
-				return new SimpleLoadJob<Texture2D>(TextureDict[path]);
+				var job = new SimpleLoadJob<Texture2D>(TextureDict[path]);
+				if (callback != null) callback(job);
+				return job;
 			} else if (File.Exists(GetCacheFilePath(path))) {
 				byte[] bytes = File.ReadAllBytes(GetCacheFilePath(path));
 
@@ -128,26 +142,34 @@ namespace LoveLivePractice.Unity {
 				texture.LoadImage(bytes);
 
 				TextureDict.Add(path, texture);
-				return new SimpleLoadJob<Texture2D>(texture);
-			} else return new WwwLoadTextureJob(path, UrlBuilder.GetUploadUrl(path), GetCacheFilePath(path));
+				var job = new SimpleLoadJob<Texture2D>(texture);
+				if (callback != null) callback(job);
+				return job;
+			} else return new WwwLoadTextureJob(path, UrlBuilder.GetUploadUrl(path), GetCacheFilePath(path), callback);
 		}
 
-		public static ILoadJob<AudioClip> LoadAudioClip(string path) {
+		public static ILoadJob<AudioClip> LoadAudioClip(string path, System.Action<ILoadJob<AudioClip>> callback = null) {
 			if (AudioClipDict.ContainsKey(path)) {
-				return new SimpleLoadJob<AudioClip>(AudioClipDict[path]);
+				var job = new SimpleLoadJob<AudioClip>(AudioClipDict[path]);
+				if (callback != null) callback(job);
+				return job;
 			} else if (File.Exists(GetCacheFilePath(path))) {
-				return new WwwLoadAudioClipJob(path, GetCacheFileUrl(path), GetCacheFilePath(path));
-			} else return new WwwLoadAudioClipJob(path, UrlBuilder.GetUploadUrl(path), GetCacheFilePath(path));
+				return new WwwLoadAudioClipJob(path, GetCacheFileUrl(path), GetCacheFilePath(path), callback);
+			} else return new WwwLoadAudioClipJob(path, UrlBuilder.GetUploadUrl(path), GetCacheFilePath(path), callback);
 		}
 
-		public static ILoadJob<string> LoadText(string path) {
+		public static ILoadJob<string> LoadText(string path, System.Action<ILoadJob<string>> callback = null) {
 			if (TextDict.ContainsKey(path)) {
-				return new SimpleLoadJob<string>(TextDict[path]);
+				var job = new SimpleLoadJob<string>(TextDict[path]);
+				if (callback != null) callback(job);
+				return job;
 			} else if (File.Exists(GetCacheFilePath(path))) {
 				string text = File.ReadAllText(GetCacheFilePath(path));
 				TextDict.Add(path, text);
-				return new SimpleLoadJob<string>(text);
-			} else return new WwwLoadTextJob(path, UrlBuilder.GetUploadUrl(path), GetCacheFilePath(path));
+				var job = new SimpleLoadJob<string>(text);
+				if (callback != null) callback(job);
+				return job;
+			} else return new WwwLoadTextJob(path, UrlBuilder.GetUploadUrl(path), GetCacheFilePath(path), callback);
 		}
 
 		public static string GetCacheFilePath(string path) {
@@ -162,28 +184,31 @@ namespace LoveLivePractice.Unity {
 			DontDestroyOnLoad(this);
 		}
 
-		readonly LinkedList<IWwwLoadJob> loadingJobs = new LinkedList<IWwwLoadJob>();
+		static readonly LinkedList<IWwwLoadJob> LoadingJobs = new LinkedList<IWwwLoadJob>();
 
 		public void FixedUpdate() {
-			if (WwwLoadJobQueue.Count <= 0) return;
+			if (WwwLoadJobQueue.Count <= 0 && LoadingJobs.Count <= 0) return;
 
-			var node = loadingJobs.First;
+			var node = LoadingJobs.First;
 			while (node != null) {
 				var next = node.Next;
-				if (node.Value.IsFinished()) loadingJobs.Remove(node);
+				if (node.Value.IsFinished()) {
+					node.Value.FinishDownload();	
+					LoadingJobs.Remove(node);
+					Debug.LogFormat("Loading: {0}, Queued: {1}", LoadingJobs.Count, WwwLoadJobQueue.Count);
+				}
 				node = next;
 			}
 
-			if (loadingJobs.Count > MaxConcurrentJobCount) return;
+			if (LoadingJobs.Count > MaxConcurrentJobCount) return;
 
-			while (WwwLoadJobQueue.Count > 0 && loadingJobs.Count <= MaxConcurrentJobCount) {
+			while (WwwLoadJobQueue.Count > 0 && LoadingJobs.Count <= MaxConcurrentJobCount) {
 				var job = WwwLoadJobQueue.First.Value;
 				WwwLoadJobQueue.RemoveFirst();
 				job.StartDownload();
-				loadingJobs.AddLast(job);
+				LoadingJobs.AddLast(job);
+				Debug.LogFormat("Loading: {0}, Queued: {1}", LoadingJobs.Count, WwwLoadJobQueue.Count);
 			}
-
-			Debug.LogFormat("Loading: {0}, Queued: {1}", loadingJobs.Count, WwwLoadJobQueue.Count);
 		}
 	}
 }

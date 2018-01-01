@@ -90,28 +90,9 @@ namespace LoveLivePractice.Unity {
 
 			hidable.Show();
 
-			for (int i = 0; i < response.content.items.Length; i += 4) {
-				var www1 = new WWW(UrlBuilder.GetCachedUploadUrl(items[i].cover_path));
-				var www2 = new WWW(UrlBuilder.GetCachedUploadUrl(items[i + 1].cover_path));
-				var www3 = new WWW(UrlBuilder.GetCachedUploadUrl(items[i + 2].cover_path));
-				var www4 = new WWW(UrlBuilder.GetCachedUploadUrl(items[i + 3].cover_path));
-
-				yield return www1;
-				yield return www2;
-				yield return www3;
-				yield return www4;
-
-				if (!string.IsNullOrEmpty(www.error)) Debug.LogError(www.error);
-
-				Items[i].Init(www1.bytes);
-				Items[i + 1].Init(www2.bytes);
-				Items[i + 2].Init(www3.bytes);
-				Items[i + 3].Init(www4.bytes);
-
-				if (!System.IO.File.Exists(Application.persistentDataPath + "/" + items[i].cover_path)) System.IO.File.WriteAllBytes(Application.persistentDataPath + "/" + items[i].cover_path, www1.bytes);
-				if (!System.IO.File.Exists(Application.persistentDataPath + "/" + items[i + 1].cover_path)) System.IO.File.WriteAllBytes(Application.persistentDataPath + "/" + items[i + 1].cover_path, www2.bytes);
-				if (!System.IO.File.Exists(Application.persistentDataPath + "/" + items[i + 2].cover_path)) System.IO.File.WriteAllBytes(Application.persistentDataPath + "/" + items[i + 2].cover_path, www3.bytes);
-				if (!System.IO.File.Exists(Application.persistentDataPath + "/" + items[i + 3].cover_path)) System.IO.File.WriteAllBytes(Application.persistentDataPath + "/" + items[i + 3].cover_path, www4.bytes);
+			for (int i = 0; i < response.content.items.Length; i++) {
+				var item = Items[i];
+				DataStore.LoadTexture(items[i].cover_path, job => item.Init(job.GetData()));
 			}
 		}
 

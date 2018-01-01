@@ -17,7 +17,10 @@ namespace LoveLivePractice.Unity {
 			set { rectTrans.anchoredPosition = new Vector2(rectTrans.anchoredPosition.x, value); }
 		}
 
-		public Texture2D Texture;
+		public Texture2D Texture {
+			get { return (Texture2D)coverUiRawImage.texture; }
+		}
+
 		public LiveListItem Item;
 		public LiveScroll Scroll;
 
@@ -34,27 +37,21 @@ namespace LoveLivePractice.Unity {
 			if (coverUiRawImage != null) coverUiRawImageRectTrans = coverUiRawImage.GetComponent<RectTransform>();
 		}
 
-		public void Start() {
-			coverUiRawImage.texture = Texture = new Texture2D(4, 4);
-		}
-
 		public void Init(LiveScroll scroll) {
 			Scroll = scroll;
 		}
 
-		public void Init(byte[] bytes) {
-			Texture.LoadImage(bytes);
-
+		public void Init(Texture2D texture) {
 			var ct = new ColorThiefDotNet.ColorThief();
-			var palette = ct.GetPalette(Texture);
+			var palette = ct.GetPalette(texture);
 			var qColor = ColorThiefDotNet.ColorThief.GetColorFromPalette(palette);
 			Colors = ColorThiefDotNet.ColorThief.GetUnityColorsFromPalette(palette);
 			backgroundColorable.Swap(qColor.Color.ToUnityColor());
 
 			if (qColor.IsDark) textColorable.Swap(Color.white);
 
-			coverUiRawImage.texture = Texture;
-			coverClipHidable.ShowWidth = (float)Texture.width / Texture.height * rectTrans.sizeDelta.y;
+			coverUiRawImage.texture = texture;
+			coverClipHidable.ShowWidth = (float)texture.width / texture.height * rectTrans.sizeDelta.y;
 			coverClipHidable.Show();
 		}
 

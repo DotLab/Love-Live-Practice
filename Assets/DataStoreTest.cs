@@ -29,6 +29,7 @@ namespace LoveLivePractice.Unity {
 			}
 
 			var mapJson = mapJob.GetData();
+			Debug.Log(mapJson.Length);
 
 			var coverJob = DataStore.LoadTexture(liveResponse.content.cover_path);
 			while (!coverJob.IsFinished()) {

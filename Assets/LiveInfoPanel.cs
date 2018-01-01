@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using Uif;
 
 using LoveLivePractice.Api;
+using LoveLivePractice.Unity;
 
 public class LiveInfoPanel : MonoBehaviour {
 	public Map LiveMap;
@@ -44,7 +45,6 @@ public class LiveInfoPanel : MonoBehaviour {
 		bgHidable.Show();
 
 		var www = new WWW(UrlBuilder.GetLiveUrl(liveListItem.live_id));
-
 		yield return www;
 		if (!string.IsNullOrEmpty(www.error)) Debug.LogError(www.error);
 
@@ -56,12 +56,12 @@ public class LiveInfoPanel : MonoBehaviour {
 
 		yield return new WaitForSeconds(playerInfoText.TransitionDuration + 0.1f);
 
-		www = new WWW(UrlBuilder.GetCachedUploadUrl(live.map_path));
-		yield return www;
-		if (!string.IsNullOrEmpty(www.error)) Debug.LogError(www.error);
-		if (!System.IO.File.Exists(Application.persistentDataPath + "/" + live.map_path)) System.IO.File.WriteAllBytes(Application.persistentDataPath + "/" + live.map_path, www.bytes);
+		var mapJob = DataStore.LoadText(live.map_path);
+		var bgmJob = DataStore.LoadAudioClip(live.bgm_path);
 
-		string json = www.text;
+		while (!mapJob.IsFinished()) yield return null;
+		string json = mapJob.GetData();
+
 		var map = JsonUtility.FromJson<Map>(Map.Transform(json));
 		LiveMap = map;
 		System.Array.Sort(LiveMap.lane);
@@ -72,12 +72,8 @@ public class LiveInfoPanel : MonoBehaviour {
 
 		mapInfoText.Swap(string.Format("Notes: {0:N0} Long: {1:N0} Parallel: {2:N0}", map.lane.Length, map.lane.Count(a => a.longnote), map.lane.Count(a => a.parallel)));
 
-		www = new WWW(UrlBuilder.GetCachedUploadUrl(live.bgm_path));
-		yield return www;
-		if (!string.IsNullOrEmpty(www.error)) Debug.LogError(www.error);
-		if (!System.IO.File.Exists(Application.persistentDataPath + "/" + live.bgm_path)) System.IO.File.WriteAllBytes(Application.persistentDataPath + "/" + live.bgm_path, www.bytes);
-
-		var clip = www.GetAudioClip();
+		while (!bgmJob.IsFinished()) yield return null;
+		var clip = bgmJob.GetData();
 		MainSource.Stop();
 		yield return new WaitForSeconds(0.1f);
 
