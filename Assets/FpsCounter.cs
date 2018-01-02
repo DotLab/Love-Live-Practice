@@ -11,6 +11,6 @@ public class FpsCounter : MonoBehaviour {
 	}
 
 	public void Update() {
-		uiText.text = (1.0f / Time.smoothDeltaTime).ToString("N1");
+		uiText.text = (1.0f / Time.deltaTime).ToString("N1");
 	}
 }

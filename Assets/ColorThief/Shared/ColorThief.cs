@@ -13,7 +13,7 @@ namespace ColorThiefDotNet {
 		/// <param name="pixelArray">Pixel array.</param>
 		/// <param name="colorCount">The color count.</param>
 		/// <returns></returns>
-		private CMap GetColorMap(byte[][] pixelArray, int colorCount) {
+		static CMap GetColorMap(byte[][] pixelArray, int colorCount) {
 			// Send array to quantize function which clusters values using median
 			// cut algorithm
 
@@ -25,7 +25,7 @@ namespace ColorThiefDotNet {
 			return cmap;
 		}
 
-		private byte[][] ConvertPixels(byte[] pixels, int pixelCount, int quality, bool ignoreWhite) {
+		static byte[][] ConvertPixels(byte[] pixels, int pixelCount, int quality, bool ignoreWhite) {
             
 
 			var expectedDataLength = pixelCount * ColorDepth;

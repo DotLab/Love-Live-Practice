@@ -89,7 +89,7 @@ public class InfiniteScroll <T> : MonoBehaviour where T : InfiniteScrollItem {
 
 		if (minIndex == firstVisibleIndex) return;
 
-		if (minIndex == firstVisibleIndex + 1 || minIndex == firstVisibleIndex - 1) {
+		if (Mathf.Abs(firstVisibleIndex - minIndex) < 4) {
 			foreach (var item in items) {
 				if (item.Y + item.Bottom + contentTop > ScrollTop && (-itemSkip * (maxIndex + 1)) + item.Top + contentTop >= ScrollBottom) {
 					maxIndex += 1;

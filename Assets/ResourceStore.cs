@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.Collections;
 using System.Collections.Generic;
 using PlayerPrefs = PreviewLabs.PlayerPrefs;
 
@@ -13,56 +12,80 @@ public class ResourceStore : MonoBehaviour {
 	static readonly Dictionary<string, Texture2D> TextureDict = new Dictionary<string, Texture2D>();
 	static readonly Dictionary<string, AudioClip> AudioClipDict = new Dictionary<string, AudioClip>();
 	static readonly Dictionary<string, string> TextDict = new Dictionary<string, string>();
+
+	static readonly LinkedList<ILoadJob> LoadJobPool = new LinkedList<ILoadJob>();
 	static readonly LinkedList<IWwwLoadJob> WwwLoadJobQueue = new LinkedList<IWwwLoadJob>();
 
-	public interface ILoadJob<T> {
+	public interface ILoadJob {
 		float GetProgress();
 		bool IsFinished();
+		void ExecuteCallback();
+	}
+
+	public interface ILoadJob<T> : ILoadJob {
 		T GetData();
 	}
 
-	public interface IWwwLoadJob {
+	public interface IWwwLoadJob : ILoadJob {
 		void StartDownload();
-		void FinishDownload();
-
-		float GetProgress();
-		bool IsFinished();
 	}
 
-	public class SimpleLoadJob<T> : ILoadJob<T> {
+	public abstract class LoadJob<T> : ILoadJob<T> {
+		readonly System.Action<ILoadJob<T>> callback;
+		bool isCallbackCalled;
+
+		public LoadJob(System.Action<ILoadJob<T>> callback) {
+			this.callback = callback;
+
+			LoadJobPool.AddLast(this);
+		}
+
+		public void ExecuteCallback() {
+			if (isCallbackCalled || callback == null) return;
+
+			callback(this);
+			isCallbackCalled = true;
+		}
+
+		public abstract float GetProgress();
+		public abstract bool IsFinished();
+		public abstract T GetData();
+	}
+
+	public class SimpleLoadJob<T> : LoadJob<T> {
 		readonly T data;
+		readonly int delay;
+		int counter;
 
-		public SimpleLoadJob(T data) {
+		public SimpleLoadJob(T data, System.Action<ILoadJob<T>> callback, int delay = 2) : base(callback) {
 			this.data = data;
+			this.delay = delay;
 		}
 
-		public float GetProgress() {
-			return 1;
+		public override float GetProgress() {
+			return (float)counter / delay;
 		}
 
-		public bool IsFinished() {
-			return true;
+		public override bool IsFinished() {
+			counter += 1;
+			return counter > delay;
 		}
 
-		public T GetData() {
+		public override T GetData() {
 			return data;
 		}
 	}
 
-	public abstract class WwwLoadJob<T> : IWwwLoadJob, ILoadJob<T> {
+	public abstract class WwwLoadJob<T> : LoadJob<T>, IWwwLoadJob {
 		protected WWW www;
 		protected T data;
 
 		protected readonly string path, url, filePath;
 
-		protected readonly System.Action<ILoadJob<T>> callback;
-
-		public WwwLoadJob(string path, string url, string filePath, System.Action<ILoadJob<T>> callback) {
+		public WwwLoadJob(string path, string url, string filePath, System.Action<ILoadJob<T>> callback) : base(callback) {
 			this.path = path;
 			this.url = url;
 			this.filePath = filePath;
-
-			this.callback = callback;
 
 			WwwLoadJobQueue.AddFirst(this);
 		}
@@ -71,21 +94,15 @@ public class ResourceStore : MonoBehaviour {
 			www = new WWW(url);
 		}
 
-		public void FinishDownload() {
-			if (callback != null) callback(this);
+		public override float GetProgress() {
+			return www == null ? 0 : www.progress;
 		}
 
-		public float GetProgress() {
-			if (www == null) return 0;
-			return www.progress;
+		public override bool IsFinished() {
+			return www != null && www.isDone;
 		}
 
-		public bool IsFinished() {
-			if (www == null) return false;
-			return www.isDone;
-		}
-
-		public T GetData() {
+		public override T GetData() {
 			if (!IsFinished()) throw new System.Exception("Job not finished!");
 
 			if (data != null) return data;
@@ -131,9 +148,7 @@ public class ResourceStore : MonoBehaviour {
 
 	public static ILoadJob<Texture2D> LoadTexture(string path, System.Action<ILoadJob<Texture2D>> callback = null) {
 		if (TextureDict.ContainsKey(path)) {
-			var job = new SimpleLoadJob<Texture2D>(TextureDict[path]);
-			if (callback != null) callback(job);
-			return job;
+			return new SimpleLoadJob<Texture2D>(TextureDict[path], callback);
 		} else if (File.Exists(GetCacheFilePath(path))) {
 			byte[] bytes = File.ReadAllBytes(GetCacheFilePath(path));
 
@@ -141,17 +156,13 @@ public class ResourceStore : MonoBehaviour {
 			texture.LoadImage(bytes);
 
 			TextureDict.Add(path, texture);
-			var job = new SimpleLoadJob<Texture2D>(texture);
-			if (callback != null) callback(job);
-			return job;
+			return new SimpleLoadJob<Texture2D>(texture, callback);
 		} else return new WwwLoadTextureJob(path, UrlBuilder.GetUploadUrl(path), GetCacheFilePath(path), callback);
 	}
 
 	public static ILoadJob<AudioClip> LoadAudioClip(string path, System.Action<ILoadJob<AudioClip>> callback = null) {
 		if (AudioClipDict.ContainsKey(path)) {
-			var job = new SimpleLoadJob<AudioClip>(AudioClipDict[path]);
-			if (callback != null) callback(job);
-			return job;
+			return new SimpleLoadJob<AudioClip>(AudioClipDict[path], callback);
 		} else if (File.Exists(GetCacheFilePath(path))) {
 			return new WwwLoadAudioClipJob(path, GetCacheFileUrl(path), GetCacheFilePath(path), callback);
 		} else return new WwwLoadAudioClipJob(path, UrlBuilder.GetUploadUrl(path), GetCacheFilePath(path), callback);
@@ -159,15 +170,11 @@ public class ResourceStore : MonoBehaviour {
 
 	public static ILoadJob<string> LoadText(string path, System.Action<ILoadJob<string>> callback = null) {
 		if (TextDict.ContainsKey(path)) {
-			var job = new SimpleLoadJob<string>(TextDict[path]);
-			if (callback != null) callback(job);
-			return job;
+			return new SimpleLoadJob<string>(TextDict[path], callback);
 		} else if (File.Exists(GetCacheFilePath(path))) {
 			string text = File.ReadAllText(GetCacheFilePath(path));
 			TextDict.Add(path, text);
-			var job = new SimpleLoadJob<string>(text);
-			if (callback != null) callback(job);
-			return job;
+			return new SimpleLoadJob<string>(text, callback);
 		} else return new WwwLoadTextJob(path, UrlBuilder.GetUploadUrl(path), GetCacheFilePath(path), callback);
 	}
 
@@ -186,27 +193,34 @@ public class ResourceStore : MonoBehaviour {
 	static readonly LinkedList<IWwwLoadJob> LoadingJobs = new LinkedList<IWwwLoadJob>();
 
 	public void FixedUpdate() {
-		if (WwwLoadJobQueue.Count <= 0 && LoadingJobs.Count <= 0) return;
-
-		var node = LoadingJobs.First;
-		while (node != null) {
-			var next = node.Next;
-			if (node.Value.IsFinished()) {
-				node.Value.FinishDownload();	
-				LoadingJobs.Remove(node);
-				Debug.LogFormat("Loading: {0}, Queued: {1}", LoadingJobs.Count, WwwLoadJobQueue.Count);
+		if (LoadJobPool.Count > 0) {
+			var node = LoadJobPool.First;
+			while (node != null && !node.Value.IsFinished()) node = node.Next;
+			if (node != null) {
+				node.Value.ExecuteCallback();
+				LoadJobPool.Remove(node);
+//				Debug.LogFormat("Jobs: {0}", LoadJobPool.Count);
 			}
-			node = next;
 		}
 
-		if (LoadingJobs.Count > MaxConcurrentJobCount) return;
+		if (LoadingJobs.Count > 0) {
+			var node = LoadingJobs.First;
+			while (node != null) {
+				var next = node.Next;
+				if (node.Value.IsFinished()) {
+					LoadingJobs.Remove(node);
+					Debug.LogFormat("Downloading: {0}, Queued: {1}", LoadingJobs.Count, WwwLoadJobQueue.Count);
+				}
+				node = next;
+			}
+		}
 
-		while (WwwLoadJobQueue.Count > 0 && LoadingJobs.Count <= MaxConcurrentJobCount) {
+		while (WwwLoadJobQueue.Count > 0 && LoadingJobs.Count < MaxConcurrentJobCount) {
 			var job = WwwLoadJobQueue.First.Value;
 			WwwLoadJobQueue.RemoveFirst();
 			job.StartDownload();
 			LoadingJobs.AddLast(job);
-			Debug.LogFormat("Loading: {0}, Queued: {1}", LoadingJobs.Count, WwwLoadJobQueue.Count);
+			Debug.LogFormat("Downloading: {0}, Queued: {1}", LoadingJobs.Count, WwwLoadJobQueue.Count);
 		}
 	}
 }

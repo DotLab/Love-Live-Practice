@@ -48,46 +48,7 @@ public class LiveScroll2 : InfiniteScroll<LiveScroll2Item> {
 	public override void InitItem(LiveScroll2Item item, int index) {
 		base.InitItem(item, index);
 
-		var live = Game.FocusLives[index];
-
-		item.TitleUiText.text = live.name;
-		item.AuthorUiText.text = live.artist + " // " + live.uploaderName;
-		item.TagUiText.text = string.Format("{0:N0} [LEVEL{1:N0}]", live.clickCount, live.level);
-
-		string starsText = "";
-		for (int i = 0; i < live.level; i++) starsText += "★ ";
-		for (int i = live.level; i < 14; i++) starsText += "☆ ";
-		item.StarsUiText.text = starsText;
-
-		ResourceStore.LoadTexture(live.coverPath, job => {
-			var texture = job.GetData();
-			live.texture = texture;
-
-			if (live.colors == null || live.colors.Length == 0) {
-				var colorThief = new ColorThiefDotNet.ColorThief();
-				var palette = colorThief.GetPalette(texture, 10);
-				var qColor = ColorThiefDotNet.ColorThief.GetColorFromPalette(palette);
-				live.color = qColor.Color.ToUnityColor();
-				live.isDark = qColor.IsDark;
-				live.colors = ColorThiefDotNet.ColorThief.GetUnityColorsFromPalette(palette);
-				Game.SetDirty();
-			}
-				
-			if (item.CoverUiRawImage.texture == null) {
-				item.BackgroundColorable.Swap(live.color);
-				if (live.isDark) item.TextColorable.Swap(Color.white);
-				
-				item.CoverUiRawImage.texture = texture;
-				item.CoverClipHidable.ShowWidth = (float)texture.width / texture.height * item.rectTrans.sizeDelta.y;
-				item.CoverClipHidable.Show();
-			} else {
-				item.BackgroundColorable.ForceSwap(live.color);
-				if (live.isDark) item.TextColorable.ForceSwap(Color.white);
-
-				item.CoverUiRawImage.texture = texture;
-				item.CoverUiRawImageRectTrans.sizeDelta = new Vector2((float)texture.width / texture.height * item.rectTrans.sizeDelta.y, item.rectTrans.sizeDelta.y);
-			}
-		});
+		item.Init(Game.FocusLives[index]);
 	}
 
 	public override void OnItemClick(LiveScroll2Item item) {

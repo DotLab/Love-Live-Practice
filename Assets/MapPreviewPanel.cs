@@ -11,19 +11,23 @@ public class MapPreviewPanel : MonoBehaviour {
 		public RectTransform RectTrans;
 		public Colorable Colorable;
 		public ApiMapNote Note;
+		public bool FlashStart;
 	}
 
 	public ApiLiveMap LiveMap;
 	public AudioSource Source;
 	public Color[] Colors;
 
-	public GameObject NotePrototype;
+	public GameObject NotePrototype, FlashPrototype;
 	public int LaneCount = 9;
 
 	public EasingType EasingType = EasingType.Cubic;
 	public EasingPhase EasingPhase = EasingPhase.Out;
 
-	public float NoteWidth = 5, LaneSpacing = 0, CacheTime = 1;
+	public float FlashWidth = 300, NoteWidth = 5, LaneSpacing = 0, CacheTime = 1;
+	public float MapOffset;
+
+	public EasedColorSwapable[] flashColors;
 
 	public RectTransform rectTrans;
 
@@ -39,15 +43,29 @@ public class MapPreviewPanel : MonoBehaviour {
 		rectTrans = GetComponent<RectTransform>();
 	}
 
+	public void Start() {
+		panelHeight = rectTrans.rect.height;
+		panelWidth = rectTrans.rect.width;
+		laneHeight = (panelHeight + LaneSpacing) / LaneCount - LaneSpacing;
+		laneSkip = -(laneHeight + LaneSpacing);
+		
+		flashColors = new EasedColorSwapable[LaneCount];
+		for (int i = 0; i < LaneCount; i++) {
+			flashColors[i] = Instantiate(FlashPrototype, rectTrans).GetComponent<EasedColorSwapable>();
+			var flashRectTrans = flashColors[i].GetComponent<RectTransform>();
+			flashRectTrans.anchoredPosition = new Vector2(0, laneSkip * i);
+			flashRectTrans.sizeDelta = new Vector2(FlashWidth, laneHeight);
+		}
+	}
+
+	public void BuildFlashes() {
+	}
+
 	public void Init(ApiLiveMap liveMap, AudioSource source) {
 		LiveMap = liveMap;
 		Source = source;
 
 		index = 0;
-		panelHeight = rectTrans.rect.height;
-		panelWidth = rectTrans.rect.width;
-		laneHeight = (panelHeight + LaneSpacing) / LaneCount - LaneSpacing;
-		laneSkip = -(laneHeight + LaneSpacing);
 	}
 
 	public void Play() {
@@ -77,6 +95,8 @@ public class MapPreviewPanel : MonoBehaviour {
 		} else {
 			time = dspTime - dspStartTime + (Time.unscaledTime - lastTime);
 		}
+
+		time += MapOffset;
 
 		double cacheTime = time + CacheTime;
 
@@ -111,18 +131,33 @@ public class MapPreviewPanel : MonoBehaviour {
 			var note = node.Value;
 
 			note.RectTrans.anchoredPosition = new Vector2((float)(note.Note.starttime - time) / CacheTime * panelWidth, laneSkip * note.Note.lane);
-			if (time - 0.1f > note.Note.endtime) {
+
+			if (note.Note.longnote && !note.FlashStart && time > note.Note.starttime) {
+				note.FlashStart = true;
+				Flash(note.Note.lane, note.Colorable.GetColor());	
+			}
+
+			if (time > note.Note.endtime) {
 				freeNodeList.AddLast(note);
 				activeNoteList.Remove(node);
+				Flash(note.Note.lane, note.Colorable.GetColor());
+				note.Colorable.SetColor(Color.clear);
 			}
 
 			node = nextNode;
 		}
 	}
 
-	float colorIndex;
+	void Flash(int lane, Color color) {
+		flashColors[lane].ForceSwap(color);
+		color.a = 0;
+		flashColors[lane].Swap(color);
+	}
 
+	float colorIndex;
 	void InitNote(MapPreviewPanelNote note) {
+		note.FlashStart = false;
+		note.RectTrans.SetAsFirstSibling();
 		note.RectTrans.sizeDelta = note.Note.longnote ? 
 			new Vector2((float)(note.Note.endtime - note.Note.starttime) / CacheTime * panelWidth, laneHeight) : 
 			new Vector2(NoteWidth, laneHeight);

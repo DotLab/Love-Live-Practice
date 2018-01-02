@@ -18,7 +18,15 @@ public static class EditorExtension {
 			NormalizeUiScale(rectTrans);
 		}
 	}
+
+	[MenuItem("Kailang/Unset Raycast Target")]
+	public static void UnsetRaycastTarget() {
+		foreach (var graphic in Selection.activeTransform.GetComponentsInChildren<UnityEngine.UI.Graphic>()) {
+			graphic.raycastTarget = false;
+		}
+	}
 #endif
+
 	public const float SnapStep = 0.5f;
 
 	public static void NormalizeUiScale(RectTransform rectTrans) {
