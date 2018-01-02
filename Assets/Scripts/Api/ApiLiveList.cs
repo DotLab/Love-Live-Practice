@@ -1,26 +1,26 @@
 ﻿namespace LoveLivePractice.Api {
 	[System.Serializable]
-	public class LiveListResponse {
+	public class ApiLiveListResponse {
 		public bool succeed;
-		public LiveList content;
+		public ApiLiveList content;
 	}
 
 	[System.Serializable]
-	public class LiveList {
+	public class ApiLiveList {
 		public int count;
-		public LiveListItem[] items;
+		public ApiLiveListItem[] items;
 	}
 
 	[System.Serializable]
-	public class LiveListItem {
+	public class ApiLiveListItem {
 		public string live_name, live_id, artist, cover_path;
 		public int click_count, level;
 		public bool memberonly;
-		public LiveListItemUser upload_user;
+		public ApiLiveListItemUser upload_user;
 	}
 
 	[System.Serializable]
-	public class LiveListItemUser {
+	public class ApiLiveListItemUser {
 		public string username;
 	}
 }

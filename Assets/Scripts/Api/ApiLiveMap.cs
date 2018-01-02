@@ -2,10 +2,10 @@
 
 namespace LoveLivePractice.Api {
 	[System.Serializable]
-	public class Map {
+	public class ApiLiveMap {
 		public string audiofile;
 		public int speed;
-		public Note[] lane;
+		public ApiMapNote[] lane;
 
 		public static string Transform(string json) {
 			string result = Regex.Replace(json, @"\[\[([^\[\]]*)\],\[([^\[\]]*)\],\[([^\[\]]*)\],\[([^\[\]]*)\],\[([^\[\]]*)\],\[([^\[\]]*)\],\[([^\[\]]*)\],\[([^\[\]]*)\],\[([^\[\]]*)\]\]", @"[$1,$2,$3,$4,$5,$6,$7,$8,$9]");
@@ -18,12 +18,12 @@ namespace LoveLivePractice.Api {
 	}
 
 	[System.Serializable]
-	public class Note : System.IComparable<Note> {
+	public class ApiMapNote : System.IComparable<ApiMapNote> {
 		public int lane;
 		public double starttime, endtime;
 		public bool longnote, parallel, hold;
 
-		public int CompareTo(Note other) {
+		public int CompareTo(ApiMapNote other) {
 			return starttime.CompareTo(other.starttime);
 		}
 	}

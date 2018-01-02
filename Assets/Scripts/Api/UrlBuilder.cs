@@ -1,5 +1,7 @@
 ﻿namespace LoveLivePractice.Api {
 	public static class UrlBuilder {
+		public const int ApiLimit = 24;
+
 		public const string ApiBaseUrl = "https://m.tianyi9.com/API/";
 		public const string UploadBaseUrl = "https://m.tianyi9.com/upload/";
 

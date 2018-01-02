@@ -15,6 +15,11 @@ namespace Uif {
 			StartCoroutine(TransitionHandler());
 		}
 
+		public void Swap(T newItem, bool forced) {
+			if (forced) ForceSwap(newItem);
+			else Swap(newItem);
+		}
+
 		protected virtual System.Collections.IEnumerator TransitionHandler() {
 			float time = 0;
 

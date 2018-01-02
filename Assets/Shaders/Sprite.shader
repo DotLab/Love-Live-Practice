@@ -68,6 +68,7 @@
 			    if (c.a != 0 && c.r == 0 && c.g == 0 && c.b == 0) {
 			        // Font
 			        c.rgb = IN.color.rgb;
+			        c.a *= IN.color.a;
 			    } else {
 			        // Sprite
 			        c *= IN.color;

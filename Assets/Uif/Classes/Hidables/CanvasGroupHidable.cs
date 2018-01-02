@@ -4,6 +4,8 @@ namespace Uif {
 	[AddComponentMenu("Uif/Hidable/CanvasGroup Hidable")]
 	[RequireComponent(typeof(CanvasGroup))]
 	public class CanvasGroupHidable : EasedHidable {
+		public bool IsShowBlocking = true;
+
 		[Range(0, 1)]
 		public float ShowAlpha = 1;
 		[Range(0, 1)]
@@ -47,6 +49,16 @@ namespace Uif {
 
 		public override void ApplyTransition(float step) {
 			group.alpha = srcAlpha + (dstAlpha - srcAlpha) * step;
+
+			if (IsShowBlocking) {
+				if (Hided()) {
+					group.interactable = true;
+					group.blocksRaycasts = false;
+				} else if (Shown()) {
+					group.interactable = false;
+					group.blocksRaycasts = true;
+				}
+			}
 		}
 	}
 }

@@ -10,10 +10,10 @@ public class MapPreviewPanel : MonoBehaviour {
 	public class MapPreviewPanelNote {
 		public RectTransform RectTrans;
 		public Colorable Colorable;
-		public Note Note;
+		public ApiMapNote Note;
 	}
 
-	public Map LiveMap;
+	public ApiLiveMap LiveMap;
 	public AudioSource Source;
 	public Color[] Colors;
 
@@ -27,7 +27,7 @@ public class MapPreviewPanel : MonoBehaviour {
 
 	public RectTransform rectTrans;
 
-	public double dspStartTime, startTime;
+	public double dspStartTime, lastTime, dspLastTime;
 
 	public int index;
 	public float panelHeight, panelWidth, laneHeight, laneSkip;
@@ -39,7 +39,7 @@ public class MapPreviewPanel : MonoBehaviour {
 		rectTrans = GetComponent<RectTransform>();
 	}
 
-	public void Init(Map liveMap, AudioSource source) {
+	public void Init(ApiLiveMap liveMap, AudioSource source) {
 		LiveMap = liveMap;
 		Source = source;
 
@@ -54,8 +54,8 @@ public class MapPreviewPanel : MonoBehaviour {
 		Source.Stop();
 		Source.Play();
 
-		dspStartTime = AudioSettings.dspTime;
-		startTime = Time.time;
+		dspLastTime = dspStartTime = AudioSettings.dspTime;
+		lastTime = Time.unscaledTime;
 
 		isPlaying = true;
 	}
@@ -68,7 +68,17 @@ public class MapPreviewPanel : MonoBehaviour {
 			return;
 		}
 
-		double time = AudioSettings.dspTime - dspStartTime, cacheTime = time + CacheTime;
+		double dspTime = AudioSettings.dspTime, time;
+
+		if (dspLastTime != dspTime) {
+			dspLastTime = dspTime;
+			lastTime = Time.unscaledTime;
+			time = dspTime - dspStartTime;
+		} else {
+			time = dspTime - dspStartTime + (Time.unscaledTime - lastTime);
+		}
+
+		double cacheTime = time + CacheTime;
 
 		var lane = LiveMap.lane;
 		while (index < lane.Length && lane[index].starttime <= cacheTime) {
@@ -110,11 +120,13 @@ public class MapPreviewPanel : MonoBehaviour {
 		}
 	}
 
+	float colorIndex;
+
 	void InitNote(MapPreviewPanelNote note) {
 		note.RectTrans.sizeDelta = note.Note.longnote ? 
 			new Vector2((float)(note.Note.endtime - note.Note.starttime) / CacheTime * panelWidth, laneHeight) : 
 			new Vector2(NoteWidth, laneHeight);
-		note.Colorable.SetColor(Colors[Random.Range(0, Colors.Length - 1)]);
+		note.Colorable.SetColor(Colors[(int)(colorIndex += 0.1f) % Colors.Length]);
 //		note.RectTrans.anchoredPosition = new Vector2(panelWidth, laneSkip * note.Note.lane);
 	}
 }

@@ -9,10 +9,8 @@ using LoveLivePractice.Api;
 using LoveLivePractice.Unity;
 
 public class LiveInfoPanel : MonoBehaviour {
-	public Map LiveMap;
-	public LiveListItem Item;
-
-	public Color[] Colors;
+	public ApiLiveMap LiveMap;
+	public Live Live;
 
 	public RawImage bgUiRawImage;
 	public AspectRatioFitter bgFitter;
@@ -22,47 +20,46 @@ public class LiveInfoPanel : MonoBehaviour {
 
 	public TextSwapable titleText, uploaderText, songInfoText, mapInfoText, playerInfoText;
 
-	public void ChangeLive(Texture2D texture, LiveListItem liveListItem) {
-		if (Item == liveListItem) return;
-		Item = liveListItem;
+	public void ChangeLive() {
+		if (Live == Game.FocusLive) return;
+		Live = Game.FocusLive;
 
 		StopAllCoroutines();
-
-		StartCoroutine(ChangeLiveHandler(texture, liveListItem));
+		StartCoroutine(ChangeLiveHandler(Game.FocusLive));
 	}
 
-	IEnumerator ChangeLiveHandler(Texture2D texture, LiveListItem liveListItem) {
+	IEnumerator ChangeLiveHandler(Live live) {
 		bgHidable.Hide();
 
 		yield return new WaitForSeconds(bgHidable.TransitionDuration + 0.1f);
 
-		titleText.Swap(liveListItem.artist + " - " + liveListItem.live_name + " [LEVEL" + liveListItem.level.ToString("N0") + "]");
-		uploaderText.Swap("Mapped by " + liveListItem.upload_user.username);
+		titleText.Swap(live.artist + " - " + live.name + " [LEVEL" + live.level.ToString("N0") + "]");
+		uploaderText.Swap("Mapped by " + live.uploaderName);
 
-		bgUiRawImage.texture = texture;
-		bgFitter.aspectRatio = (float)texture.width / texture.height;
+		bgUiRawImage.texture = live.texture;
+		bgFitter.aspectRatio = (float)live.texture.width / live.texture.height;
 	
 		bgHidable.Show();
 
-		var www = new WWW(UrlBuilder.GetLiveUrl(liveListItem.live_id));
+		var www = new WWW(UrlBuilder.GetLiveUrl(live.id));
 		yield return www;
 		if (!string.IsNullOrEmpty(www.error)) Debug.LogError(www.error);
 
-		var response = JsonUtility.FromJson<LiveResponse>(www.text);
-		var live = response.content;
+		var response = JsonUtility.FromJson<ApiLiveResponse>(www.text);
+		var apiLive = response.content;
 
-		songInfoText.Swap(string.Format("Category: {0} Likes: {1:N0} Played: {2:N0}", live.category.name, live.like_count, live.click_count));
-		playerInfoText.Swap(live.live_info);
+		songInfoText.Swap(string.Format("Category: {0} Likes: {1:N0} Played: {2:N0}", apiLive.category.name, apiLive.like_count, apiLive.click_count));
+		playerInfoText.Swap(apiLive.live_info);
 
 		yield return new WaitForSeconds(playerInfoText.TransitionDuration + 0.1f);
 
-		var mapJob = DataStore.LoadText(live.map_path);
-		var bgmJob = DataStore.LoadAudioClip(live.bgm_path);
+		var mapJob = ResourceStore.LoadText(apiLive.map_path);
+		var bgmJob = ResourceStore.LoadAudioClip(apiLive.bgm_path);
 
 		while (!mapJob.IsFinished()) yield return null;
 		string json = mapJob.GetData();
 
-		var map = JsonUtility.FromJson<Map>(Map.Transform(json));
+		var map = JsonUtility.FromJson<ApiLiveMap>(ApiLiveMap.Transform(json));
 		LiveMap = map;
 		System.Array.Sort(LiveMap.lane);
 		foreach (var note in LiveMap.lane) {
@@ -78,7 +75,7 @@ public class LiveInfoPanel : MonoBehaviour {
 		yield return new WaitForSeconds(0.1f);
 
 		MainSource.clip = clip;
-		mapPreviewPanel.Colors = Colors;
+		mapPreviewPanel.Colors = live.colors;
 		mapPreviewPanel.Init(LiveMap, MainSource);
 		mapPreviewPanel.Play();
 	}

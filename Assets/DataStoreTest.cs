@@ -20,9 +20,9 @@ namespace LoveLivePractice.Unity {
 
 		public IEnumerator TestHandler() {
 			var liveJson = SyncUtil.Get(UrlBuilder.GetLiveUrl("h4SFEBaRxDXz3bzB"));
-			var liveResponse = JsonUtility.FromJson<LiveResponse>(liveJson);
+			var liveResponse = JsonUtility.FromJson<ApiLiveResponse>(liveJson);
 
-			var mapJob = DataStore.LoadText(liveResponse.content.map_path);
+			var mapJob = ResourceStore.LoadText(liveResponse.content.map_path);
 			while (!mapJob.IsFinished()) {
 				Debug.Log("mapJob: " + mapJob.GetProgress());
 				yield return new WaitForSeconds(0.5f);
@@ -31,7 +31,7 @@ namespace LoveLivePractice.Unity {
 			var mapJson = mapJob.GetData();
 			Debug.Log(mapJson.Length);
 
-			var coverJob = DataStore.LoadTexture(liveResponse.content.cover_path);
+			var coverJob = ResourceStore.LoadTexture(liveResponse.content.cover_path);
 			while (!coverJob.IsFinished()) {
 				Debug.Log("coverJob: " + coverJob.GetProgress());
 				yield return new WaitForSeconds(0.5f);
@@ -39,7 +39,7 @@ namespace LoveLivePractice.Unity {
 
 			texture = coverJob.GetData();
 
-			var bgmJob = DataStore.LoadAudioClip(liveResponse.content.bgm_path);
+			var bgmJob = ResourceStore.LoadAudioClip(liveResponse.content.bgm_path);
 			while (!bgmJob.IsFinished()) {
 				Debug.Log("bgmJob: " + bgmJob.GetProgress());
 				yield return new WaitForSeconds(0.5f);

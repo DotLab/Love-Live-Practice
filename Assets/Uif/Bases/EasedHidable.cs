@@ -6,6 +6,8 @@ namespace Uif {
 		public EasingType TransitionEasingType = EasingType.Cubic;
 		public EasingPhase TransitionEasingPhase = EasingPhase.InOut;
 		public float TransitionDuration = 0.5f;
+
+		public System.Action Callback;
 	
 		public override void Show() {
 			if (!Shown()) {
@@ -38,6 +40,8 @@ namespace Uif {
 			}
 
 			ApplyTransition(1);
+
+			FinishTransition();
 		}
 
 		public abstract void PrepareShow();
@@ -45,5 +49,12 @@ namespace Uif {
 		public abstract void PrepareHide();
 
 		public abstract void ApplyTransition(float step);
+
+		public void FinishTransition() {
+			if (Callback != null) {
+				Callback();
+				Callback = null;
+			}
+		}
 	}
 }

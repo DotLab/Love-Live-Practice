@@ -6,27 +6,21 @@ using Uif;
 using LoveLivePractice.Api;
 
 namespace LoveLivePractice.Unity {
-	public class LiveScrollItem : MonoBehaviour {
+	public class LiveScrollItem : InfiniteScrollItem {
 		public float Width {
 			get { return rectTrans.sizeDelta.x; }
 			set { rectTrans.sizeDelta = new Vector2(value, rectTrans.sizeDelta.y); }
-		}
-
-		public float Y {
-			get { return rectTrans.anchoredPosition.y; }
-			set { rectTrans.anchoredPosition = new Vector2(rectTrans.anchoredPosition.x, value); }
 		}
 
 		public Texture2D Texture {
 			get { return (Texture2D)coverUiRawImage.texture; }
 		}
 
-		public LiveListItem Item;
-		public LiveScroll Scroll;
+		public ApiLiveListItem Item;
 
 		public Color[] Colors;
 
-		public RectTransform rectTrans, coverUiRawImageRectTrans;
+		public RectTransform coverUiRawImageRectTrans;
 		public RawImage coverUiRawImage;
 		public Text titleUiText, authorUiText, tagUiText, starsUiText;
 		public ColorableSwapable backgroundColorable, textColorable;
@@ -37,13 +31,9 @@ namespace LoveLivePractice.Unity {
 			if (coverUiRawImage != null) coverUiRawImageRectTrans = coverUiRawImage.GetComponent<RectTransform>();
 		}
 
-		public void Init(LiveScroll scroll) {
-			Scroll = scroll;
-		}
-
 		public void Init(Texture2D texture) {
 			var ct = new ColorThiefDotNet.ColorThief();
-			var palette = ct.GetPalette(texture);
+			var palette = ct.GetPalette(texture, 10);
 			var qColor = ColorThiefDotNet.ColorThief.GetColorFromPalette(palette);
 			Colors = ColorThiefDotNet.ColorThief.GetUnityColorsFromPalette(palette);
 			backgroundColorable.Swap(qColor.Color.ToUnityColor());
@@ -55,7 +45,7 @@ namespace LoveLivePractice.Unity {
 			coverClipHidable.Show();
 		}
 
-		public void Init(LiveListItem item) {
+		public void Init(ApiLiveListItem item) {
 			Item = item;
 
 			titleUiText.text = item.live_name;
@@ -66,10 +56,6 @@ namespace LoveLivePractice.Unity {
 			for (int i = 0; i < item.level; i++) starsText += "★ ";
 			for (int i = item.level; i < 14; i++) starsText += "☆ ";
 			starsUiText.text = starsText;
-		}
-
-		public void OnButtonPressed() {
-			Scroll.OnItemPressed(this);
 		}
 	}
 }

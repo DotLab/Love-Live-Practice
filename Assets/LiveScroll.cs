@@ -7,8 +7,8 @@ using LoveLivePractice.Api;
 
 namespace LoveLivePractice.Unity {
 	public class LiveScroll : MonoBehaviour {
-		public LiveScrollItem[] Items;
 		public GameObject ItemPrototype;
+		public LiveScrollItem[] ItemInstances;
 
 		public float ItemHeight = 70, ItemSpacing = 2, ItemMinWidth = 360, ItemMaxWidth = 480;
 		public int Limit = 24, CurrentPage = 0;
@@ -31,40 +31,53 @@ namespace LoveLivePractice.Unity {
 		}
 
 		public void Start() {
-			visibleItemCount = (int)(CanvasSizer.GetCanvasHeight() * 0.5f / (ItemHeight + ItemSpacing) + 1);
+			visibleItemCount = (int)(CanvasSizer.GetCanvasHeight() * 0.5 / (ItemHeight + ItemSpacing) + 1);
+
+			BuildItems();
+			Update();
 
 			ChangePage();
 		}
 
-		public void FixedUpdate() {
+		public void BuildItems() {
+			ItemInstances = new LiveScrollItem[visibleItemCount * 2];
+			for (int i = 0; i < visibleItemCount * 2; i++) {
+				var item = Instantiate(ItemPrototype, contentRectTrans).GetComponent<LiveScrollItem>();
+				ItemInstances[i] = item;
+
+				item.Width = ItemMinWidth;
+				item.Y = -i * (ItemHeight + ItemSpacing);
+				item.Index = i;
+			}
+
+			contentRectTrans.sizeDelta = new Vector2(contentRectTrans.sizeDelta.x, (ItemHeight + ItemSpacing) * Limit - ItemSpacing);
+		}
+
+		public void Update() {
 			if (dirty) {
+				dirty = false;
+
 				float position = contentRectTrans.anchoredPosition.y / (ItemHeight + ItemSpacing);
 				int index = (int)position + 1;
+
+				int minIndex = Mathf.Max(0, index - visibleItemCount), maxIndex = Mathf.Min(Limit, index + visibleItemCount);
+
+				var freeInstanceList = new System.Collections.Generic.LinkedList<LiveScrollItem>();
+				for (int i = 0; i < ItemInstances.Length; i++) {
+					if (ItemInstances[i].Index < minIndex || ItemInstances[i].Index >= maxIndex) {
+						freeInstanceList.AddLast(ItemInstances[i]);
+						continue;
+					}
+
+
+				}
 
 				for (int i = Mathf.Max(0, index - visibleItemCount); i < Mathf.Min(Limit, index + visibleItemCount); i++) {
 					float step = 1 - (Mathf.Abs(i - position) / visibleItemCount);
 					step = Easing.Ease(EasingType, EasingPhase, step);
-					Items[i].Width = ItemMinWidth + step * (ItemMaxWidth - ItemMinWidth);
+					ItemInstances[i].Width = ItemMinWidth + step * (ItemMaxWidth - ItemMinWidth);
 				}
 			}
-		}
-
-		[ContextMenu("BuildItems")]
-		public void BuildItems() {
-			if (contentRectTrans.childCount != 0) return;
-
-			Items = new LiveScrollItem[Limit];
-			for (int i = 0; i < Limit; i++) {
-				var item = Instantiate(ItemPrototype, contentRectTrans).GetComponent<LiveScrollItem>();
-				Items[i] = item;
-
-				item.Width = ItemMinWidth;
-				item.Y = -i * (ItemHeight + ItemSpacing);
-
-				item.Init(this);
-			}
-
-			contentRectTrans.sizeDelta = new Vector2(contentRectTrans.sizeDelta.x, (ItemHeight + ItemSpacing) * Limit - ItemSpacing);
 		}
 
 		[ContextMenu("ChangePage")]
@@ -81,18 +94,18 @@ namespace LoveLivePractice.Unity {
 			yield return www;
 			if (!string.IsNullOrEmpty(www.error)) Debug.LogError(www.error);
 
-			var response = JsonUtility.FromJson<LiveListResponse>(www.text);
+			var response = JsonUtility.FromJson<ApiLiveListResponse>(www.text);
 			var items = response.content.items;
 
 			for (int i = 0; i < response.content.items.Length; i++) {
-				Items[i].Init(items[i]);
+				ItemInstances[i].Init(items[i]);
 			}
 
 			hidable.Show();
 
 			for (int i = 0; i < response.content.items.Length; i++) {
-				var item = Items[i];
-				DataStore.LoadTexture(items[i].cover_path, job => item.Init(job.GetData()));
+				var item = ItemInstances[i];
+				ResourceStore.LoadTexture(items[i].cover_path, job => item.Init(job.GetData()));
 			}
 		}
 
@@ -101,8 +114,8 @@ namespace LoveLivePractice.Unity {
 		}
 
 		public void OnItemPressed(LiveScrollItem item) {
-			liveInfoPanel.ChangeLive(item.Texture, item.Item);
-			liveInfoPanel.Colors = item.Colors;
+//			liveInfoPanel.ChangeLive(item.Texture, item.Item);
+//			liveInfoPanel.Colors = item.Colors;
 		}
 	}
 }

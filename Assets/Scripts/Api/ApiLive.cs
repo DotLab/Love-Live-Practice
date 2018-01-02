@@ -1,29 +1,29 @@
 ﻿namespace LoveLivePractice.Api {
 	[System.Serializable]
-	public class LiveResponse {
+	public class ApiLiveResponse {
 		public bool succeed;
-		public Live content;
+		public ApiLive content;
 	}
 
 	[System.Serializable]
-	public class Live {
+	public class ApiLive {
 		public string live_name, live_info, live_id, update_time, state;
 		public string artist, bgimg_path, bgm_path, cover_path, map_path;
 		public int level, like_count, click_count;
 		public bool memberonly;
 
-		public LiveCategory category;
-		public LiveUser upload_user;
+		public ApiLiveCategory category;
+		public ApiLiveUser upload_user;
 	}
 
 	[System.Serializable]
-	public class LiveCategory {
+	public class ApiLiveCategory {
 		public string name;
 		public int id;
 	}
 
 	[System.Serializable]
-	public class LiveUser {
+	public class ApiLiveUser {
 		public string username, avatar_path;
 		public int post_count;
 	}
