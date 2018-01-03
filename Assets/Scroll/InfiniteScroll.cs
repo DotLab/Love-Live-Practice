@@ -71,9 +71,9 @@ public class InfiniteScroll <T> : MonoBehaviour where T : InfiniteScrollItem {
 	public int minIndex, maxIndex;
 
 	public void UpdateScroll() {
-		if (notInfinite) return;
-
 		contentTop = contentRectTrans.anchoredPosition.y + contentRectTrans.rect.yMax;
+
+		if (notInfinite) return;
 
 		firstVisibleIndex = Mathf.FloorToInt((contentTop - ScrollTop + ItemSpacing) / itemSkip);
 		lastVisibleIndex = firstVisibleIndex + visibleItemCount - 1;

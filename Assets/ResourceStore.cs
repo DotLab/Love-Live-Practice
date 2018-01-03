@@ -221,7 +221,7 @@ public class ResourceStore : MonoBehaviour {
 					LoadingJobs.Remove(node);
 					Debug.LogFormat("Downloading: {0}, Queued: {1}", LoadingJobs.Count, WwwLoadJobQueue.Count);
 				} else {
-					Debug.LogFormat("Downloading: {0:P1}", node.Value.GetProgress());
+//					Debug.LogFormat("Downloading: {0:P1}", node.Value.GetProgress());
 				}
 				node = next;
 			}

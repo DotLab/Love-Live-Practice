@@ -29,18 +29,20 @@ public class MenuScheduler : MonoBehaviour {
 		
 	IEnumerator StartHandler() {
 #if UNITY_EDITOR
-		Game.LoadCachedData();
-
-		Game.AvailableLiveCount = Game.CachedLives.Count;
-		Game.IsOffline = true;
-
-//		Game.IsOffline = false;
+		if (Game.LiveMap.Keys.Count == 0) {
+			Game.LoadCachedData();
 //
-//		var www = new WWW(UrlBuilder.GetLiveListUrl(0, UrlBuilder.ApiLimit));
-//		yield return www;
-//		if (!string.IsNullOrEmpty(www.error)) Debug.LogError(www.error);
-//		var response = JsonUtility.FromJson<ApiLiveListResponse>(www.text);
-//		Game.CacheLiveList(response.content.items);
+//			Game.AvailableLiveCount = Game.CachedLives.Count;
+//			Game.IsOffline = true;
+
+			Game.IsOffline = false;
+
+			var www = new WWW(UrlBuilder.GetLiveListUrl(0, UrlBuilder.ApiLimit));
+			yield return www;
+			if (!string.IsNullOrEmpty(www.error)) Debug.LogError(www.error);
+			var response = JsonUtility.FromJson<ApiLiveListResponse>(www.text);
+			Game.CacheLiveList(response.content.items);
+		}
 #endif
 
 		yield return new WaitForSeconds(1);

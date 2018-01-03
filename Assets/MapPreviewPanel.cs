@@ -26,7 +26,8 @@ public class MapPreviewPanel : MonoBehaviour {
 	public float FlashWidth = 300, NoteWidth = 5, LaneSpacing = 0, CacheTime = 1;
 	public float MapOffset;
 
-	public EasedColorSwapable[] flashColors;
+	public Colorable[] flashColors;
+	public EasedHidable[] flashHidables;
 
 	public RectTransform rectTrans;
 
@@ -48,16 +49,15 @@ public class MapPreviewPanel : MonoBehaviour {
 		laneHeight = (panelHeight + LaneSpacing) / LaneCount - LaneSpacing;
 		laneSkip = -(laneHeight + LaneSpacing);
 		
-		flashColors = new EasedColorSwapable[LaneCount];
+		flashColors = new Colorable[LaneCount];
+		flashHidables = new EasedHidable[LaneCount];
 		for (int i = 0; i < LaneCount; i++) {
-			flashColors[i] = Instantiate(FlashPrototype, rectTrans).GetComponent<EasedColorSwapable>();
+			flashColors[i] = Instantiate(FlashPrototype, rectTrans).GetComponent<Colorable>();
+			flashHidables[i] = flashColors[i].GetComponent<EasedHidable>();
 			var flashRectTrans = flashColors[i].GetComponent<RectTransform>();
 			flashRectTrans.anchoredPosition = new Vector2(0, laneSkip * i);
 			flashRectTrans.sizeDelta = new Vector2(FlashWidth, laneHeight);
 		}
-	}
-
-	public void BuildFlashes() {
 	}
 
 	public void Init(LiveMapNote[] notes) {
@@ -149,9 +149,9 @@ public class MapPreviewPanel : MonoBehaviour {
 	}
 
 	void Flash(int lane, Color color) {
-		flashColors[lane].ForceSwap(color);
-		color.a = 0;
-		flashColors[lane].Swap(color);
+		flashColors[lane].SetColor(color);
+		flashHidables[lane].ForceShow();
+		flashHidables[lane].Hide();
 	}
 
 	float colorIndex;
