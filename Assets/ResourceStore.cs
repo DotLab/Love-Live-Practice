@@ -174,14 +174,18 @@ public class ResourceStore : MonoBehaviour {
 	}
 
 	public static ILoadJob<string> LoadText(string path, System.Action<ILoadJob<string>> callback = null) {
-		if (TextDict.ContainsKey(path)) {
-			return new SimpleLoadJob<string>(TextDict[path], callback);
-		} else if (File.Exists(GetCacheFilePath(path))) {
-			string text = File.ReadAllText(GetCacheFilePath(path));
-			TextDict.Add(path, text);
+		return LoadText(path, UrlBuilder.GetUploadUrl(path));
+	}
+
+	public static ILoadJob<string> LoadText(string key, string url, System.Action<ILoadJob<string>> callback = null) {
+		if (TextDict.ContainsKey(key)) {
+			return new SimpleLoadJob<string>(TextDict[key], callback);
+		} else if (File.Exists(GetCacheFilePath(key))) {
+			string text = File.ReadAllText(GetCacheFilePath(key));
+			TextDict.Add(key, text);
 			return new SimpleLoadJob<string>(text, callback);
-		} else if (!WwwLoadJobDict.ContainsKey(path)) return new WwwLoadTextJob(path, UrlBuilder.GetUploadUrl(path), GetCacheFilePath(path), callback);
-		else return (ILoadJob<string>)WwwLoadJobDict[path];
+		} else if (!WwwLoadJobDict.ContainsKey(key)) return new WwwLoadTextJob(key, url, GetCacheFilePath(key), callback);
+		else return (ILoadJob<string>)WwwLoadJobDict[key];
 	}
 
 	public static string GetCacheFilePath(string path) {

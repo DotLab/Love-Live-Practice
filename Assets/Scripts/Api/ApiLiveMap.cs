@@ -20,7 +20,7 @@ namespace LoveLivePractice.Api {
 	[System.Serializable]
 	public class ApiMapNote : System.IComparable<ApiMapNote> {
 		public int lane;
-		public double starttime, endtime;
+		public float starttime, endtime;
 		public bool longnote, parallel, hold;
 
 		public int CompareTo(ApiMapNote other) {

@@ -10,12 +10,11 @@ public class MapPreviewPanel : MonoBehaviour {
 	public class MapPreviewPanelNote {
 		public RectTransform RectTrans;
 		public Colorable Colorable;
-		public ApiMapNote Note;
+		public LiveMapNote Note;
 		public bool FlashStart;
 	}
 
-	public ApiLiveMap LiveMap;
-	public AudioSource Source;
+	public LiveMapNote[] MapNotes;
 	public Color[] Colors;
 
 	public GameObject NotePrototype, FlashPrototype;
@@ -61,16 +60,14 @@ public class MapPreviewPanel : MonoBehaviour {
 	public void BuildFlashes() {
 	}
 
-	public void Init(ApiLiveMap liveMap, AudioSource source) {
-		LiveMap = liveMap;
-		Source = source;
+	public void Init(LiveMapNote[] notes) {
+		MapNotes = notes;
 
 		index = 0;
 	}
 
 	public void Play() {
-		Source.Stop();
-		Source.Play();
+		MusicPlayer.Instance.Play();
 
 		dspLastTime = dspStartTime = AudioSettings.dspTime;
 		lastTime = Time.unscaledTime;
@@ -78,10 +75,14 @@ public class MapPreviewPanel : MonoBehaviour {
 		isPlaying = true;
 	}
 
+	public void Stop() {
+		isPlaying = false;
+	}
+
 	public void Update() {
 		if (!isPlaying) return;
 
-		if (!Source.isPlaying) {
+		if (!MusicPlayer.Instance.IsPlaying()) {
 			isPlaying = false;
 			return;
 		}
@@ -100,9 +101,8 @@ public class MapPreviewPanel : MonoBehaviour {
 
 		double cacheTime = time + CacheTime;
 
-		var lane = LiveMap.lane;
-		while (index < lane.Length && lane[index].starttime <= cacheTime) {
-			var note = lane[index];
+		while (index < MapNotes.Length && MapNotes[index].starttime <= cacheTime) {
+			var note = MapNotes[index];
 			MapPreviewPanelNote panelNote;
 
 			// Show lane[mapNoteIndex]
@@ -159,7 +159,7 @@ public class MapPreviewPanel : MonoBehaviour {
 		note.FlashStart = false;
 		note.RectTrans.SetAsFirstSibling();
 		note.RectTrans.sizeDelta = note.Note.longnote ? 
-			new Vector2((float)(note.Note.endtime - note.Note.starttime) / CacheTime * panelWidth, laneHeight) : 
+			new Vector2((note.Note.endtime - note.Note.starttime) / CacheTime * panelWidth, laneHeight) : 
 			new Vector2(NoteWidth, laneHeight);
 		note.Colorable.SetColor(Colors[(int)(colorIndex += 0.1f) % Colors.Length]);
 	}

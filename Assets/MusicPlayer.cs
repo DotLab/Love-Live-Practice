@@ -36,7 +36,8 @@ public class MusicPlayer : MonoBehaviour {
 	}
 
 	public void Play() {
-		volumeHidable.Callback = audioSource.Play;
+		volumeHidable.ForceHide();
+		audioSource.Play();
 		volumeHidable.Show();
 	}
 
@@ -48,5 +49,9 @@ public class MusicPlayer : MonoBehaviour {
 	public void Pause() {
 		volumeHidable.Callback = audioSource.Pause;
 		volumeHidable.Hide();
+	}
+
+	public bool IsPlaying() {
+		return audioSource.isPlaying;
 	}
 }
