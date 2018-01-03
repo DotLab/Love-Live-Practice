@@ -9,6 +9,8 @@ public class LiveScroll : InfiniteScroll<LiveScrollItem> {
 	public EasingType EasingType = EasingType.Cubic;
 	public EasingPhase EasingPhase = EasingPhase.Out;
 
+	public float HorizontalDragLimit = 0.2f;
+
 	public bool Dirty;
 
 	public LiveInfoPanel liveInfoPanel;
@@ -34,6 +36,14 @@ public class LiveScroll : InfiniteScroll<LiveScrollItem> {
 	public void Update() {
 		if (Dirty) {
 			Dirty = false;
+
+			if (SwipeControl.Swipe == SwipeControl.SwipeDirection.Left) {
+				Debug.Log("Next Page");
+				MenuScheduler.NextPage();
+			} else if (SwipeControl.Swipe == SwipeControl.SwipeDirection.Right) {
+				Debug.Log("Previous Page");
+				MenuScheduler.PreviousPage();
+			}
 
 			UpdateScroll();
 

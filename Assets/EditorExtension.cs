@@ -25,6 +25,13 @@ public static class EditorExtension {
 			graphic.raycastTarget = false;
 		}
 	}
+
+	[MenuItem("Kailang/Set Raycast Target")]
+	public static void SetRaycastTarget() {
+		foreach (var graphic in Selection.activeTransform.GetComponentsInChildren<UnityEngine.UI.Graphic>()) {
+			graphic.raycastTarget = true;
+		}
+	}
 #endif
 
 	public const float SnapStep = 0.5f;

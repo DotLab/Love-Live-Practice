@@ -45,7 +45,7 @@ public class LiveScrollItem : InfiniteScrollItem {
 
 	void Init2(Live live) {
 		if (live.colors == null || live.colors.Length == 0) {
-//			Debug.Log("Calculate color");
+			Debug.Log("Calculate color");
 			var colorThiefJob = new ColorThiefDotNet.ColorThief.ColorThiefJob(live.texture, job => {
 				var palette = job.GetData();
 				var qColor = ColorThiefDotNet.ColorThief.GetColorFromPalette(palette);
@@ -72,8 +72,10 @@ public class LiveScrollItem : InfiniteScrollItem {
 //			CoverClipHidable.ShowWidth = (float)live.texture.width / live.texture.height * rectTrans.sizeDelta.y;
 //			CoverClipHidable.Show();
 //		} else {
-		BackgroundColorable.ForceSwap(live.color);
+		BackgroundColorable.ForceSwap(new Color(live.color.r, live.color.g, live.color.b, BackgroundColorable.colorable.GetColor().a));
+
 		if (live.isDark) TextColorable.ForceSwap(Color.white);
+		else TextColorable.ForceSwap(Color.black);
 
 		CoverUiRawImage.texture = live.texture;
 		CoverUiRawImageRectTrans.sizeDelta = new Vector2((float)live.texture.width / live.texture.height * rectTrans.sizeDelta.y, rectTrans.sizeDelta.y);

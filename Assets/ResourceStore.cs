@@ -15,6 +15,7 @@ public class ResourceStore : MonoBehaviour {
 
 	static readonly LinkedList<ILoadJob> LoadJobPool = new LinkedList<ILoadJob>();
 	static readonly LinkedList<IWwwLoadJob> WwwLoadJobQueue = new LinkedList<IWwwLoadJob>();
+	static readonly Dictionary<string, IWwwLoadJob> WwwLoadJobDict = new Dictionary<string, IWwwLoadJob>();
 
 	public interface ILoadJob {
 		float GetProgress();
@@ -88,6 +89,7 @@ public class ResourceStore : MonoBehaviour {
 			this.filePath = filePath;
 
 			WwwLoadJobQueue.AddFirst(this);
+			WwwLoadJobDict.Add(path, this);
 		}
 
 		public void StartDownload() {
@@ -157,15 +159,18 @@ public class ResourceStore : MonoBehaviour {
 
 			TextureDict.Add(path, texture);
 			return new SimpleLoadJob<Texture2D>(texture, callback);
-		} else return new WwwLoadTextureJob(path, UrlBuilder.GetUploadUrl(path), GetCacheFilePath(path), callback);
+		} else if (!WwwLoadJobDict.ContainsKey(path)) return new WwwLoadTextureJob(path, UrlBuilder.GetUploadUrl(path), GetCacheFilePath(path), callback);
+		else return (ILoadJob<Texture2D>)WwwLoadJobDict[path];
 	}
 
 	public static ILoadJob<AudioClip> LoadAudioClip(string path, System.Action<ILoadJob<AudioClip>> callback = null) {
 		if (AudioClipDict.ContainsKey(path)) {
 			return new SimpleLoadJob<AudioClip>(AudioClipDict[path], callback);
 		} else if (File.Exists(GetCacheFilePath(path))) {
-			return new WwwLoadAudioClipJob(path, GetCacheFileUrl(path), GetCacheFilePath(path), callback);
-		} else return new WwwLoadAudioClipJob(path, UrlBuilder.GetUploadUrl(path), GetCacheFilePath(path), callback);
+			if (!WwwLoadJobDict.ContainsKey(path)) return new WwwLoadAudioClipJob(path, GetCacheFileUrl(path), GetCacheFilePath(path), callback);
+			else return (ILoadJob<AudioClip>)WwwLoadJobDict[path];
+		} else if (!WwwLoadJobDict.ContainsKey(path)) return new WwwLoadAudioClipJob(path, UrlBuilder.GetUploadUrl(path), GetCacheFilePath(path), callback);
+		else return (ILoadJob<AudioClip>)WwwLoadJobDict[path];
 	}
 
 	public static ILoadJob<string> LoadText(string path, System.Action<ILoadJob<string>> callback = null) {
@@ -175,7 +180,8 @@ public class ResourceStore : MonoBehaviour {
 			string text = File.ReadAllText(GetCacheFilePath(path));
 			TextDict.Add(path, text);
 			return new SimpleLoadJob<string>(text, callback);
-		} else return new WwwLoadTextJob(path, UrlBuilder.GetUploadUrl(path), GetCacheFilePath(path), callback);
+		} else if (!WwwLoadJobDict.ContainsKey(path)) return new WwwLoadTextJob(path, UrlBuilder.GetUploadUrl(path), GetCacheFilePath(path), callback);
+		else return (ILoadJob<string>)WwwLoadJobDict[path];
 	}
 
 	public static string GetCacheFilePath(string path) {
@@ -199,7 +205,7 @@ public class ResourceStore : MonoBehaviour {
 			if (node != null) {
 				node.Value.ExecuteCallback();
 				LoadJobPool.Remove(node);
-//				Debug.LogFormat("Jobs: {0}", LoadJobPool.Count);
+				Debug.LogFormat("Jobs: {0}", LoadJobPool.Count);
 			}
 		}
 
@@ -210,6 +216,8 @@ public class ResourceStore : MonoBehaviour {
 				if (node.Value.IsFinished()) {
 					LoadingJobs.Remove(node);
 					Debug.LogFormat("Downloading: {0}, Queued: {1}", LoadingJobs.Count, WwwLoadJobQueue.Count);
+				} else {
+					Debug.LogFormat("Downloading: {0:P1}", node.Value.GetProgress());
 				}
 				node = next;
 			}

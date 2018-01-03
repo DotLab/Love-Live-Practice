@@ -47,7 +47,7 @@ public class InfiniteScroll <T> : MonoBehaviour where T : InfiniteScrollItem {
 
 		if (ItemCount <= visibleItemCount) {  // Infinite scroll is not needed;
 			for (int i = 0; i < ItemCount; i++) {
-				items[i].gameObject.SetActive(true);
+				if (notInfinite) items[i].gameObject.SetActive(true);
 				InitItem(items[i], i);
 			}
 
@@ -58,7 +58,7 @@ public class InfiniteScroll <T> : MonoBehaviour where T : InfiniteScrollItem {
 			notInfinite = true;
 		} else {
 			for (int i = 0; i < visibleItemCount; i++) {
-				items[i].gameObject.SetActive(true);
+				if (notInfinite) items[i].gameObject.SetActive(true);
 				InitItem(items[i], i);
 			}
 
@@ -102,7 +102,7 @@ public class InfiniteScroll <T> : MonoBehaviour where T : InfiniteScrollItem {
 				}
 			}
 		} else {
-//			Debug.Log("Flush");
+			Debug.Log("Flush");
 			for (int i = 0; i < visibleItemCount; i++) {
 				InitItem(items[i], firstVisibleIndex + i);
 			}

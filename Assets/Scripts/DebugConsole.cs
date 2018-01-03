@@ -47,7 +47,7 @@ namespace LoveLivePractice {
 			}
 
 			if (lines.Count > LineLimit) lines.RemoveRange(0, lines.Count - LineLimit);
-			uiText.text = lines.Aggregate("", (acc, x) => acc + x);
+			uiText.text = lines.Aggregate("", (acc, x) => acc + x).TrimEnd();
 		}
 	}
 }
