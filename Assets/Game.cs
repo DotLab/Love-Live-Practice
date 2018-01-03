@@ -13,23 +13,31 @@ public class Game : MonoBehaviour {
 	public static bool IsOffline;
 	public static readonly Dictionary<string, Live> LiveMap = new Dictionary<string, Live>();
 
+	public static int AvailableLiveCount;
+
+	public static int FocusLiveLimit = 24;
 	public static readonly List<Live> FocusLives = new List<Live>(), CachedLives = new List<Live>();
 	public static Live FocusLive;
 
 	public static bool Dirty;
 
-	public static bool LoadCachedData() {
-		if (Store.HasKey(LiveListKey)) {
-			var lives = JsonUtility.FromJson<LiveList>(Store.GetString(LiveListKey)).lives;
-			foreach (var live in lives) {
-				LiveMap.Add(live.id, live);
-				if (live.cached) CachedLives.Add(live);
-			}
+	public static void LoadCachedData() {
+		if (!Store.HasKey(LiveListKey)) return;
 
-			return true;
+		var lives = JsonUtility.FromJson<LiveList>(Store.GetString(LiveListKey)).lives;
+		foreach (var live in lives) {
+			LiveMap.Add(live.id, live);
+			if (live.cached) CachedLives.Add(live);
 		}
 
-		return false;
+		FocusCachedLives(0, FocusLiveLimit);
+	}
+
+	public static void FocusCachedLives(int offset, int limit) {
+		FocusLives.Clear();
+
+		if (offset > CachedLives.Count) return; 
+		FocusLives.AddRange(CachedLives.GetRange(offset, Mathf.Min(limit, CachedLives.Count - offset)));
 	}
 
 	public static void CacheLiveList(ApiLiveListItem[] items) {

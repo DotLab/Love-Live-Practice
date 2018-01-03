@@ -26,17 +26,21 @@ public class MenuScheduler : MonoBehaviour {
 
 		StartCoroutine(StartHandler());
 	}
-
+		
 	IEnumerator StartHandler() {
 #if UNITY_EDITOR
 		Game.LoadCachedData();
-		Game.IsOffline = false;
 
-		var www = new WWW(UrlBuilder.GetLiveListUrl(0, UrlBuilder.ApiLimit));
-		yield return www;
-		if (!string.IsNullOrEmpty(www.error)) Debug.LogError(www.error);
-		var response = JsonUtility.FromJson<ApiLiveListResponse>(www.text);
-		Game.CacheLiveList(response.content.items);
+		Game.AvailableLiveCount = Game.CachedLives.Count;
+		Game.IsOffline = true;
+
+//		Game.IsOffline = false;
+//
+//		var www = new WWW(UrlBuilder.GetLiveListUrl(0, UrlBuilder.ApiLimit));
+//		yield return www;
+//		if (!string.IsNullOrEmpty(www.error)) Debug.LogError(www.error);
+//		var response = JsonUtility.FromJson<ApiLiveListResponse>(www.text);
+//		Game.CacheLiveList(response.content.items);
 #endif
 
 		yield return new WaitForSeconds(1);
@@ -48,7 +52,11 @@ public class MenuScheduler : MonoBehaviour {
 	}
 
 	public void ChangePage(int newPage) {
-		if (newPage < 0) return;
+		if (newPage < 0 || newPage >= Game.AvailableLiveCount / Game.FocusLiveLimit) {
+			pageNumberInput.text = currentPage.ToString();
+			return;
+		}
+
 		currentPage = newPage;
 		pageNumberInput.text = currentPage.ToString();
 
@@ -61,12 +69,16 @@ public class MenuScheduler : MonoBehaviour {
 
 		yield return Wait(liveScroll.hidable.TransitionDuration + 0.1f);
 
-		var www = new WWW(UrlBuilder.GetLiveListUrl(UrlBuilder.ApiLimit * currentPage, UrlBuilder.ApiLimit));
-		yield return www;
-		if (!string.IsNullOrEmpty(www.error)) Debug.LogError(www.error);
-
-		var apiLiveList = JsonUtility.FromJson<ApiLiveListResponse>(www.text).content;
-		Game.CacheLiveList(apiLiveList.items);
+		if (Game.IsOffline) {
+			Game.FocusCachedLives(Game.FocusLiveLimit * currentPage, Game.FocusLiveLimit);
+		} else {
+			var www = new WWW(UrlBuilder.GetLiveListUrl(UrlBuilder.ApiLimit * currentPage, UrlBuilder.ApiLimit));
+			yield return www;
+			if (!string.IsNullOrEmpty(www.error)) Debug.LogError(www.error);
+			
+			var apiLiveList = JsonUtility.FromJson<ApiLiveListResponse>(www.text).content;
+			Game.CacheLiveList(apiLiveList.items);
+		}
 
 		liveScroll.RebuildContent();
 

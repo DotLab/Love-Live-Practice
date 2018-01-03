@@ -43,6 +43,7 @@ public class WelcomeScheduler : MonoBehaviour {
 			statusText.Swap("Network error, entering Offline Mode");
 			yield return wait;
 
+			Game.AvailableLiveCount = Game.CachedLives.Count;
 			Game.IsOffline = true;
 		} else {
 			var apiLiveList = JsonUtility.FromJson<ApiLiveListResponse>(www.text).content;
@@ -51,6 +52,7 @@ public class WelcomeScheduler : MonoBehaviour {
 			statusText.Swap("Good to go, entering Online Mode");
 			yield return wait;
 
+			Game.AvailableLiveCount = apiLiveList.count;
 			Game.IsOffline = false;
 		}
 
