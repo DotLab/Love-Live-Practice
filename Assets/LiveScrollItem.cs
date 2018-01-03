@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 using Uif;
 
-public class LiveScroll2Item : InfiniteScrollItem {
+public class LiveScrollItem : InfiniteScrollItem {
 	public Texture2D Texture {
 		get { return (Texture2D)CoverUiRawImage.texture; }
 	}

@@ -9,7 +9,7 @@ public class MenuScheduler : MonoBehaviour {
 	public static MenuScheduler Instance;
 
 	public EasedHidable maskHidable, flashHidable;
-	public LiveScroll2 liveScroll;
+	public LiveScroll liveScroll;
 	public LiveInfoPanel liveInfoPanel;
 
 	public void Start() {

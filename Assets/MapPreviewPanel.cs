@@ -141,7 +141,7 @@ public class MapPreviewPanel : MonoBehaviour {
 				freeNodeList.AddLast(note);
 				activeNoteList.Remove(node);
 				Flash(note.Note.lane, note.Colorable.GetColor());
-				note.Colorable.SetColor(Color.clear);
+				note.RectTrans.anchoredPosition = new Vector2(note.RectTrans.anchoredPosition.x - 100, 0);
 			}
 
 			node = nextNode;
@@ -162,6 +162,5 @@ public class MapPreviewPanel : MonoBehaviour {
 			new Vector2((float)(note.Note.endtime - note.Note.starttime) / CacheTime * panelWidth, laneHeight) : 
 			new Vector2(NoteWidth, laneHeight);
 		note.Colorable.SetColor(Colors[(int)(colorIndex += 0.1f) % Colors.Length]);
-//		note.RectTrans.anchoredPosition = new Vector2(panelWidth, laneSkip * note.Note.lane);
 	}
 }
