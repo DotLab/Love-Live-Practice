@@ -39,17 +39,17 @@ public class LiveScrollItem : InfiniteScrollItem {
 		starsUiText.text = starsText;
 
 		if (live.texture != null) {
-			Init2(live);
+			Init2(live, false);
 		} else {
 			LocalStorage.LoadTexture(live.coverPath, job => {
 				var texture = job.GetData();
 				live.texture = texture;
-				Init2(live);
+				Init2(live, true);
 			});
 		}
 	}
 
-	void Init2(Live live) {
+	void Init2(Live live, bool ease) {
 		if (live.colors == null || live.colors.Length == 0) {
 			if (LocalStorage.IsJobPending(live.id)) return;
 
@@ -64,32 +64,32 @@ public class LiveScrollItem : InfiniteScrollItem {
 				Game.SetDirty();
 //				Debug.LogFormat("CT ({0}) end {1:F1}", live.id, Time.time);
 
-				Init3(live);
-			});
+				Init3(live, true);
+			}, 10, 10, false);
 
 			colorThiefJob.Start();
 		} else {
-			Init3(live);
+			Init3(live, ease);
 		}
 	}
 
-	void Init3(Live live) {
+	void Init3(Live live, bool ease) {
 		// Animation is too slow
-//		if (CoverUiRawImage.texture == null) {
-//		backgroundColorable.Swap(live.color);
-//		if (live.isDark) textColorable.Swap(Color.white);
-//		else textColorable.Swap(Color.black);
-//
-//		coverUiRawImage.texture = live.texture;
-//		coverClipHidable.ShowWidth = (float)live.texture.width / live.texture.height * rectTrans.sizeDelta.y;
-//		coverClipHidable.Show();
-//		} else {
-		backgroundColorable.ForceSwap(new Color(live.color.r, live.color.g, live.color.b, backgroundColorable.colorable.GetColor().a));
-		if (live.isDark) textColorable.ForceSwap(Color.white);
-		else textColorable.ForceSwap(Color.black);
+		if (ease) {
+			backgroundColorable.Swap(live.color);
+			if (live.isDark) textColorable.Swap(Color.white);
+			else textColorable.Swap(Color.black);
 
-		coverUiRawImage.texture = live.texture;
-		coverUiRawImageRectTrans.sizeDelta = new Vector2((float)live.texture.width / live.texture.height * rectTrans.sizeDelta.y, rectTrans.sizeDelta.y);
-//		}
+			coverUiRawImage.texture = live.texture;
+			coverClipHidable.ShowWidth = (float)live.texture.width / live.texture.height * rectTrans.sizeDelta.y;
+			coverClipHidable.Show();
+		} else {
+			backgroundColorable.ForceSwap(live.color);
+			if (live.isDark) textColorable.ForceSwap(Color.white);
+			else textColorable.ForceSwap(Color.black);
+
+			coverUiRawImage.texture = live.texture;
+			coverUiRawImageRectTrans.sizeDelta = new Vector2((float)live.texture.width / live.texture.height * rectTrans.sizeDelta.y, rectTrans.sizeDelta.y);
+		}
 	}
 }

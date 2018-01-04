@@ -31,6 +31,7 @@ namespace ColorThiefDotNet {
 					var pixelArray = ConvertPixels(pixels, pixelCount, quality, ignoreWhite);
 					var cmap = GetColorMap(pixelArray, colorCount);
 					if (cmap != null) colors = cmap.GeneratePalette();
+					colors.Sort((a, b) => a.Population.CompareTo(b.Population));
 				});
 			}
 

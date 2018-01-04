@@ -9,6 +9,7 @@ using LoveLivePractice.Api;
 
 public class Game : MonoBehaviour {
 	const string GameDataKey = "game_data";
+	const int GameDataVersion = 1;
 
 	public static bool IsOffline;
 	public static readonly Dictionary<string, Live> LiveDict = new Dictionary<string, Live>();
@@ -22,9 +23,14 @@ public class Game : MonoBehaviour {
 	public static void LoadGameData() {
 		if (!Store.HasKey(GameDataKey)) return;
 
-		var liveList = JsonUtility.FromJson<GameData>(Store.GetString(GameDataKey));
-		AvailableLiveCount = liveList.availableLiveCount;
-		foreach (var live in liveList.lives) {
+		var data = JsonUtility.FromJson<GameData>(Store.GetString(GameDataKey));
+		if (data.version != GameDataVersion) {
+			Store.DeleteKey(GameDataKey);
+			return;
+		}
+
+		AvailableLiveCount = data.availableLiveCount;
+		foreach (var live in data.lives) {
 			LiveDict.Add(live.id, live);
 			if (live.cached) CachedLives.Add(live);
 		}
@@ -61,6 +67,7 @@ public class Game : MonoBehaviour {
 		Dirty = false;
 
 		Store.SetString(GameDataKey, JsonUtility.ToJson(new GameData { 
+			version = GameDataVersion,
 			lives = LiveDict.Values.ToArray(),
 			availableLiveCount = AvailableLiveCount,
 		}));

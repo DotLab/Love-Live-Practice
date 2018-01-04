@@ -3,6 +3,7 @@ using LoveLivePractice.Api;
 
 [System.Serializable]
 public class GameData {
+	public int version;
 	public int availableLiveCount;
 	public Live[] lives;
 }
