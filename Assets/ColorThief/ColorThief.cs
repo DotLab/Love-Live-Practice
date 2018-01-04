@@ -7,13 +7,20 @@ using Texture2D = UnityEngine.Texture2D;
 
 namespace ColorThiefDotNet {
 	public partial class ColorThief {
-		public class ColorThiefJob : ResourceStore.LoadJob<List<QuantizedColor>> {
+		public class ColorThiefJob : LocalStorage.LoadJob<List<QuantizedColor>> {
 			UnityEngine.Color32[] bmp;
 
 			Thread thread;
 			List<QuantizedColor> colors;
 
-			public ColorThiefJob(Texture2D sourceImage, Action<ResourceStore.ILoadJob<List<QuantizedColor>>> callback = null, int colorCount = DefaultColorCount, int quality = DefaultQuality, bool ignoreWhite = DefaultIgnoreWhite) : base(callback) {
+			public ColorThiefJob(
+				string key,
+				Texture2D sourceImage, 
+				Action<LocalStorage.ILoadJob<List<QuantizedColor>>> callback = null, 
+				int colorCount = DefaultColorCount, 
+				int quality = DefaultQuality, 
+				bool ignoreWhite = DefaultIgnoreWhite) : base(key, callback) {
+
 				if (quality < 1) quality = DefaultQuality;
 
 				bmp = sourceImage.GetPixels32();
@@ -100,7 +107,7 @@ namespace ColorThiefDotNet {
 			return new List<QuantizedColor>();
 		}
 
-		private byte[][] GetPixelsFast(Texture2D sourceImage, int quality, bool ignoreWhite) {
+		byte[][] GetPixelsFast(Texture2D sourceImage, int quality, bool ignoreWhite) {
 			if (quality < 1) {
 				quality = DefaultQuality;
 			}
