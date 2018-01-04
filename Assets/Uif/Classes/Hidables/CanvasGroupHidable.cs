@@ -52,10 +52,10 @@ namespace Uif {
 
 			if (IsShowBlocking) {
 				if (Hided()) {
-					group.interactable = true;
+//					group.interactable = true;
 					group.blocksRaycasts = false;
 				} else if (Shown()) {
-					group.interactable = false;
+//					group.interactable = false;
 					group.blocksRaycasts = true;
 				}
 			}

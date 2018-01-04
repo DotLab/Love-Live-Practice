@@ -24,8 +24,9 @@ public class Game : MonoBehaviour {
 	public static void LoadCachedData() {
 		if (!Store.HasKey(LiveListKey)) return;
 
-		var lives = JsonUtility.FromJson<LiveList>(Store.GetString(LiveListKey)).lives;
-		foreach (var live in lives) {
+		var liveList = JsonUtility.FromJson<LiveList>(Store.GetString(LiveListKey));
+		AvailableLiveCount = liveList.availableLiveCount;
+		foreach (var live in liveList.lives) {
 			LiveMap.Add(live.id, live);
 			if (live.cached) CachedLives.Add(live);
 		}
@@ -61,7 +62,10 @@ public class Game : MonoBehaviour {
 		if (LiveMap.Values.Count == 0 || !Dirty) return;
 		Dirty = false;
 
-		Store.SetString(LiveListKey, JsonUtility.ToJson(new LiveList{ lives = LiveMap.Values.ToArray() }));
+		Store.SetString(LiveListKey, JsonUtility.ToJson(new LiveList { 
+			lives = LiveMap.Values.ToArray(),
+			availableLiveCount = AvailableLiveCount,
+		}));
 
 		Store.Flush();
 
@@ -71,6 +75,7 @@ public class Game : MonoBehaviour {
 
 [System.Serializable]
 public class LiveList {
+	public int availableLiveCount;
 	public Live[] lives;
 }
 

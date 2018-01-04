@@ -14,6 +14,16 @@ public class MapPreviewPanel : MonoBehaviour {
 		public bool FlashStart;
 	}
 
+	[System.Serializable]
+	public class MapPreviewPanelFlash {
+		public RectTransform RectTrans;
+		public Colorable Colorable;
+		public EasedHidable Hidable;
+		public AudioSource Source;
+	}
+
+	public AudioClip HitClip;
+
 	public LiveMapNote[] MapNotes;
 	public Color[] Colors;
 
@@ -26,8 +36,7 @@ public class MapPreviewPanel : MonoBehaviour {
 	public float FlashWidth = 300, NoteWidth = 5, LaneSpacing = 0, CacheTime = 1;
 	public float MapOffset;
 
-	public Colorable[] flashColors;
-	public EasedHidable[] flashHidables;
+	public MapPreviewPanelFlash[] flashes;
 
 	public RectTransform rectTrans;
 
@@ -49,14 +58,19 @@ public class MapPreviewPanel : MonoBehaviour {
 		laneHeight = (panelHeight + LaneSpacing) / LaneCount - LaneSpacing;
 		laneSkip = -(laneHeight + LaneSpacing);
 		
-		flashColors = new Colorable[LaneCount];
-		flashHidables = new EasedHidable[LaneCount];
+		flashes = new MapPreviewPanelFlash[LaneCount];
 		for (int i = 0; i < LaneCount; i++) {
-			flashColors[i] = Instantiate(FlashPrototype, rectTrans).GetComponent<Colorable>();
-			flashHidables[i] = flashColors[i].GetComponent<EasedHidable>();
-			var flashRectTrans = flashColors[i].GetComponent<RectTransform>();
-			flashRectTrans.anchoredPosition = new Vector2(0, laneSkip * i);
-			flashRectTrans.sizeDelta = new Vector2(FlashWidth, laneHeight);
+			var flashGo = Instantiate(FlashPrototype, rectTrans);
+
+			flashes[i] = new MapPreviewPanelFlash { 
+				RectTrans = flashGo.GetComponent<RectTransform>(),
+				Hidable = flashGo.GetComponent<EasedHidable>(),
+				Colorable = flashGo.GetComponent<Colorable>(),
+				Source = flashGo.GetComponent<AudioSource>(),
+			};
+
+			flashes[i].RectTrans.anchoredPosition = new Vector2(0, laneSkip * i);
+			flashes[i].RectTrans.sizeDelta = new Vector2(FlashWidth, laneHeight);
 		}
 	}
 
@@ -77,6 +91,15 @@ public class MapPreviewPanel : MonoBehaviour {
 
 	public void Stop() {
 		isPlaying = false;
+
+		var node = activeNoteList.First;
+		while (node != null) {
+			var next = node.Next;
+			node.Value.RectTrans.anchoredPosition = new Vector2(1000, 0);
+			freeNodeList.AddLast(node.Value);
+			activeNoteList.Remove(node);
+			node = next;
+		}
 	}
 
 	public void Update() {
@@ -130,7 +153,11 @@ public class MapPreviewPanel : MonoBehaviour {
 			var nextNode = node.Next;
 			var note = node.Value;
 
-			note.RectTrans.anchoredPosition = new Vector2((float)(note.Note.starttime - time) / CacheTime * panelWidth, laneSkip * note.Note.lane);
+			float stepStart = Easing.Ease(EasingType, EasingPhase, note.Note.starttime - time, CacheTime);
+			float stepEnd = Easing.Ease(EasingType, EasingPhase, note.Note.endtime - time, CacheTime);
+
+			note.RectTrans.anchoredPosition = new Vector2(stepStart * panelWidth, laneSkip * note.Note.lane);
+			if (note.Note.longnote) note.RectTrans.sizeDelta = new Vector2((stepEnd - stepStart) * panelWidth, laneHeight);
 
 			if (note.Note.longnote && !note.FlashStart && time > note.Note.starttime) {
 				note.FlashStart = true;
@@ -149,18 +176,17 @@ public class MapPreviewPanel : MonoBehaviour {
 	}
 
 	void Flash(int lane, Color color) {
-		flashColors[lane].SetColor(color);
-		flashHidables[lane].ForceShow();
-		flashHidables[lane].Hide();
+		flashes[lane].Source.Play();
+		flashes[lane].Colorable.SetColor(color);
+		flashes[lane].Hidable.ForceShow();
+		flashes[lane].Hidable.Hide();
 	}
 
 	float colorIndex;
 	void InitNote(MapPreviewPanelNote note) {
 		note.FlashStart = false;
 		note.RectTrans.SetAsFirstSibling();
-		note.RectTrans.sizeDelta = note.Note.longnote ? 
-			new Vector2((note.Note.endtime - note.Note.starttime) / CacheTime * panelWidth, laneHeight) : 
-			new Vector2(NoteWidth, laneHeight);
+		note.RectTrans.sizeDelta = new Vector2(NoteWidth, laneHeight);
 		note.Colorable.SetColor(Colors[(int)(colorIndex += 0.1f) % Colors.Length]);
 	}
 }

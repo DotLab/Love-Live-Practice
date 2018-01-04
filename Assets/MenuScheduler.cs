@@ -54,7 +54,7 @@ public class MenuScheduler : MonoBehaviour {
 	}
 
 	public void ChangePage(int newPage) {
-		if (newPage < 0 || newPage >= Game.AvailableLiveCount / Game.FocusLiveLimit) {
+		if ((Game.IsOffline && (newPage < 0 || newPage >= Game.CachedLives.Count / Game.FocusLiveLimit)) || (!Game.IsOffline && (newPage < 0 || newPage >= Game.AvailableLiveCount / Game.FocusLiveLimit))) {
 			pageNumberInput.text = currentPage.ToString();
 			return;
 		}
