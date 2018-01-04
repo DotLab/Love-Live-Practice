@@ -8,11 +8,11 @@ using UnityEngine;
 using LoveLivePractice.Api;
 
 public class LocalStorage : MonoBehaviour {
-	public const int MaxConcurrentJobCount = 4;
+	const int MaxConcurrentJobCount = 4;
 
-	static readonly Dictionary<string, Texture2D> TextureDict = new Dictionary<string, Texture2D>();
-	static readonly Dictionary<string, AudioClip> AudioClipDict = new Dictionary<string, AudioClip>();
-	static readonly Dictionary<string, string> TextDict = new Dictionary<string, string>();
+	public static readonly Dictionary<string, Texture2D> TextureDict = new Dictionary<string, Texture2D>();
+	public static readonly Dictionary<string, AudioClip> AudioClipDict = new Dictionary<string, AudioClip>();
+	public static readonly Dictionary<string, string> TextDict = new Dictionary<string, string>();
 
 	static readonly LinkedList<ILoadJob> PendingLoadJobPool = new LinkedList<ILoadJob>();
 	static readonly Dictionary<string, ILoadJob> PendingLoadJobDict = new Dictionary<string, ILoadJob>();
@@ -160,6 +160,15 @@ public class LocalStorage : MonoBehaviour {
 
 	public static bool IsJobPending(string key) {
 		return PendingLoadJobDict.ContainsKey(key);
+	}
+
+	public static void ClearStorage() {
+		foreach (var item in TextureDict.Values) Destroy(item);
+		foreach (var item in AudioClipDict.Values) Destroy(item);
+
+		TextureDict.Clear();
+		AudioClipDict.Clear();
+		TextDict.Clear();
 	}
 
 	public static ILoadJob<Texture2D> LoadTexture(string path, Action<ILoadJob<Texture2D>> callback = null) {

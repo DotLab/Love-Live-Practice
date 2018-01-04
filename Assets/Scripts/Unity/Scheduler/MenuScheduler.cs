@@ -82,6 +82,10 @@ public class MenuScheduler : MonoBehaviour {
 			Game.ActivateApiLiveList(apiLiveList.items);
 		}
 
+		if (Game.ActiveLive != null && Game.ActiveLive.texture != null) LocalStorage.TextureDict.Remove(Game.ActiveLive.coverPath);
+		LocalStorage.ClearStorage();
+		if (Game.ActiveLive != null && Game.ActiveLive.texture != null) LocalStorage.TextureDict.Add(Game.ActiveLive.coverPath, Game.ActiveLive.texture);
+
 		liveScroll.RebuildContent();
 
 		liveScroll.hidable.Show();
