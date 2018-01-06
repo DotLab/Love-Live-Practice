@@ -14,6 +14,8 @@ public class LiveScrollItem : InfiniteScrollItem {
 		set { rectTrans.sizeDelta = new Vector2(value, rectTrans.sizeDelta.y); }
 	}
 
+	new public ParticleSystem particleSystem;
+
 	public RectTransform coverUiRawImageRectTrans;
 	public RawImage coverUiRawImage;
 
@@ -26,8 +28,24 @@ public class LiveScrollItem : InfiniteScrollItem {
 		coverUiRawImageRectTrans.sizeDelta = new Vector2(0, rectTrans.sizeDelta.y);
 	}
 
+	public void Select(bool forced = false) {
+		backgroundColorable.Swap(Color.white, forced);
+		textColorable.Swap(Color.black, forced);
+		particleSystem.Play();
+	}
+
+	public void Deselect(Live live) {
+		particleSystem.Stop();
+		if (live.colors != null && live.colors.Length != 0) {
+			backgroundColorable.Swap(live.color);
+			if (live.isDark) textColorable.Swap(Color.white);
+			else textColorable.Swap(Color.black);
+		}
+	}
+
 	public void Init(Live live) {
 		ClearTexture();
+		particleSystem.Stop();
 
 		titleUiText.text = live.name;
 		authorUiText.text = live.artist + " // " + live.uploaderName;
@@ -41,6 +59,8 @@ public class LiveScrollItem : InfiniteScrollItem {
 		if (live.texture != null) {
 			Init2(live, false);
 		} else {
+			if (LocalStorage.IsJobPending(live.coverPath)) return;
+
 			LocalStorage.LoadTexture(live.coverPath, job => {
 				var texture = job.GetData();
 				live.texture = texture;
@@ -74,20 +94,19 @@ public class LiveScrollItem : InfiniteScrollItem {
 	}
 
 	void Init3(Live live, bool ease) {
-		// Animation is too slow
-		if (ease) {
-			backgroundColorable.Swap(live.color);
-			if (live.isDark) textColorable.Swap(Color.white);
-			else textColorable.Swap(Color.black);
+		if (Game.ActiveLive == live) {
+			Select(!ease);
+		} else {
+			backgroundColorable.Swap(live.color, !ease);
+			if (live.isDark) textColorable.Swap(Color.white, !ease);
+			else textColorable.Swap(Color.black, !ease);
+		}
 
+		if (ease) {
 			coverUiRawImage.texture = live.texture;
 			coverClipHidable.ShowWidth = (float)live.texture.width / live.texture.height * rectTrans.sizeDelta.y;
 			coverClipHidable.Show();
 		} else {
-			backgroundColorable.ForceSwap(live.color);
-			if (live.isDark) textColorable.ForceSwap(Color.white);
-			else textColorable.ForceSwap(Color.black);
-
 			coverUiRawImage.texture = live.texture;
 			coverUiRawImageRectTrans.sizeDelta = new Vector2((float)live.texture.width / live.texture.height * rectTrans.sizeDelta.y, rectTrans.sizeDelta.y);
 		}

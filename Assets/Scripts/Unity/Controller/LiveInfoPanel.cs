@@ -67,9 +67,9 @@ public class LiveInfoPanel : MonoBehaviour {
 		mapInfoText.Swap(string.Format("Notes: {0:N0} Long: {1:N0} Parallel: {2:N0} Hold: {3:N0}", live.noteCount, live.longCount, live.parallelCount, live.holdCount));
 
 		while (!bgmJob.IsFinished()) yield return null;
-		var clip = bgmJob.GetData();
+		live.clip = bgmJob.GetData();
 
-		MusicPlayer.Instance.SetClip(clip);
+		MusicPlayer.Instance.SetClip(live.clip);
 		mapPreviewPanel.Colors = live.colors;
 		mapPreviewPanel.Init(live.notes);
 		mapPreviewPanel.Play();

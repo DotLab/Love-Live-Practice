@@ -60,7 +60,15 @@ public class LiveScroll : InfiniteScroll<LiveScrollItem> {
 	}
 
 	public override void OnItemClick(LiveScrollItem item) {
-		Game.ActiveLive = Game.ActiveLives[item.Index];
-		MenuScheduler.ChangeLive();
+		if (Game.ActiveLive == Game.ActiveLives[item.Index]) {  // Select agin
+			item.particleSystem.Stop();
+			MenuScheduler.PlayLive();
+		} else {
+			foreach (var i in items) if (Game.ActiveLives[i.Index] == Game.ActiveLive) i.Deselect(Game.ActiveLives[i.Index]);
+			Game.ActiveLive = Game.ActiveLives[item.Index];
+			item.Select();
+
+			MenuScheduler.ChangeLive();
+		}
 	}
 }

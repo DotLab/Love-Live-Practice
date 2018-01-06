@@ -1,16 +1,11 @@
 fileFormatVersion: 2
-guid: a74928a6b02eea84ba55cb9c7956da65
-timeCreated: 1515207160
+guid: a54e9a1605559304696d5d545560e7f2
+timeCreated: 1515200216
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
-    21300000: ui-shape_0
-    21300002: ui-shape_1
-    21300004: ui-shape_2
-    21300006: ui-shape_3
-    21300008: ui-shape_4
-    21300010: ui-shape_5
-    21300012: ui-shape_6
+    21300000: ll-bar_0
+    21300002: ll-bar_1
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -35,7 +30,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     filterMode: -1
-    aniso: 16
+    aniso: -1
     mipBias: -1
     wrapMode: 1
   nPOTScale: 0
@@ -47,7 +42,7 @@ TextureImporter:
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
-  spritePixelsToUnits: 300
+  spritePixelsToUnits: 800
   alphaUsage: 1
   alphaIsTransparency: 1
   spriteTessellationDetail: -1
@@ -85,94 +80,29 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: ui-shape_0
+      name: ll-bar_0
       rect:
         serializedVersion: 2
-        x: 33
-        y: 33
-        width: 30
-        height: 30
+        x: 132
+        y: 4
+        width: 120
+        height: 120
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 15, y: 15, z: 15, w: 15}
+      border: {x: 60, y: 60, z: 60, w: 60}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: ui-shape_1
+      name: ll-bar_1
       rect:
         serializedVersion: 2
-        x: 1
-        y: 48
-        width: 30
-        height: 15
+        x: 144
+        y: 144
+        width: 96
+        height: 96
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 15, y: 0, z: 15, w: 15}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: ui-shape_2
-      rect:
-        serializedVersion: 2
-        x: 1
-        y: 1
-        width: 14
-        height: 14
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 7, y: 7, z: 7, w: 7}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: ui-shape_3
-      rect:
-        serializedVersion: 2
-        x: 17
-        y: 17
-        width: 14
-        height: 14
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 7, y: 7, z: 7, w: 7}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: ui-shape_4
-      rect:
-        serializedVersion: 2
-        x: 33
-        y: 1
-        width: 30
-        height: 30
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 15, y: 15, z: 15, w: 15}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: ui-shape_5
-      rect:
-        serializedVersion: 2
-        x: 17
-        y: 1
-        width: 14
-        height: 14
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: ui-shape_6
-      rect:
-        serializedVersion: 2
-        x: 1
-        y: 17
-        width: 14
-        height: 14
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
+      border: {x: 48, y: 48, z: 48, w: 48}
       outline: []
       tessellationDetail: 0
     outline: []

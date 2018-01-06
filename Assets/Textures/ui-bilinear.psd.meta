@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: b806422ad964dae4c86f919375475ec2
-timeCreated: 1514928900
+timeCreated: 1515198746
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -337,25 +337,25 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 17
-        y: 22
+        y: 21
         width: 1
-        height: 9
+        height: 11
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
+      border: {x: 0, y: 5, z: 0, w: 5}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
       name: ui-bilinear_18
       rect:
         serializedVersion: 2
-        x: 13
+        x: 12
         y: 26
-        width: 9
+        width: 11
         height: 1
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
+      border: {x: 5, y: 0, z: 5, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
@@ -402,9 +402,9 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 17
-        y: 22
+        y: 21
         width: 1
-        height: 4
+        height: 5
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -414,7 +414,7 @@ TextureImporter:
       name: ui-bilinear_23
       rect:
         serializedVersion: 2
-        x: 13
+        x: 14
         y: 27
         width: 9
         height: 4
@@ -466,10 +466,10 @@ TextureImporter:
       name: ui-bilinear_27
       rect:
         serializedVersion: 2
-        x: 13
-        y: 22
-        width: 9
-        height: 9
+        x: 12
+        y: 21
+        width: 11
+        height: 11
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}

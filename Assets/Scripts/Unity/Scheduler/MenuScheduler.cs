@@ -9,7 +9,9 @@ using LoveLivePractice.Api;
 public class MenuScheduler : MonoBehaviour {
 	public static MenuScheduler Instance;
 
-	public EasedHidable maskHidable, flashHidable;
+	public GameObject touchBlocker;
+
+	public EasedHidable mainHidable, maskHidable, flashHidable;
 	public LiveScroll liveScroll;
 	public LiveInfoPanel liveInfoPanel;
 	public InputField pageNumberInput;
@@ -104,6 +106,22 @@ public class MenuScheduler : MonoBehaviour {
 	public static void ChangeLive() {
 		Instance.Flash();
 		Instance.liveInfoPanel.ChangeLive();
+	}
+
+	public static void PlayLive() {
+		Instance.touchBlocker.SetActive(true);
+
+		Instance.StartCoroutine(Instance.PlayLiveHandler());
+	}
+
+	IEnumerator PlayLiveHandler() {
+		yield return null;
+
+		mainHidable.Hide();
+
+		yield return Wait(mainHidable.TransitionDuration + 0.1f);
+
+		UnityEngine.SceneManagement.SceneManager.LoadScene("Play");
 	}
 
 	static int currentPage, maxPage;

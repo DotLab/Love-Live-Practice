@@ -25,7 +25,7 @@
 				}
 			}
 		}
-
+			
 		public override bool Shown() {
 			return MainHidable == null || MainHidable.Shown();
 		}
@@ -33,7 +33,7 @@
 		public override bool Hided() {
 			return MainHidable == null || MainHidable.Hided();
 		}
-
+			
 		public override void ForceShow() {
 			foreach (var hidable in Hidables) hidable.ForceShow();
 		}

@@ -26,6 +26,8 @@ public class Live {
 
 	[System.NonSerialized]
 	public Texture2D texture;
+	[System.NonSerialized]
+	public AudioClip clip;
 
 	public Live() {
 	}
