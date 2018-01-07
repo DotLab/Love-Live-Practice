@@ -47,10 +47,18 @@ public class MenuScheduler : MonoBehaviour {
 		}
 #endif
 
-		yield return new WaitForSeconds(1);
+		if (Game.ActiveLive == null) {
+			yield return new WaitForSeconds(1);
+			
+			maskHidable.Hide();
+			yield return Wait(maskHidable.TransitionDuration);
+		} else {
+			liveInfoPanel.bgUiRawImage.texture = Game.ActiveLive.texture;
+			liveInfoPanel.bgFitter.aspectRatio = (float)Game.ActiveLive.texture.width / Game.ActiveLive.texture.height;
+			liveInfoPanel.bgHidable.ForceShow();
 
-		maskHidable.Hide();
-		yield return Wait(maskHidable.TransitionDuration);
+			maskHidable.ForceHide();
+		}
 
 		liveScroll.RebuildContent();
 	}

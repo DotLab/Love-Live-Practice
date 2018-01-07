@@ -17,5 +17,6 @@ public class PlayPanelButton : MonoBehaviour {
 
 	public RectTransform rectTrans;
 	public Image circleUiImage;
-	new public ParticleSystem particleSystem;
+	public ParticleSystem longPressParticleSystem, shortPressParticleSystem;
+	public AudioSource source;
 }

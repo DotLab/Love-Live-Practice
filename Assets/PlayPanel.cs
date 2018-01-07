@@ -1,12 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 using Uif;
 
 [ExecuteInEditMode]
 public class PlayPanel : MonoBehaviour {
 	public GameObject ButtonPrototype, ShortNotePrototype, LongNotePrototype;
+
+	public AudioClip PerfectClip, GreatClip, GoodClip;
 
 	public float ButtonSize = 200;
 	public int ButtonCount = 9;
@@ -26,6 +29,8 @@ public class PlayPanel : MonoBehaviour {
 	public LiveMapNote[] MapNotes;
 	public float MapOffset;
 
+	public Sprite PerfectSprite, GreatSprite, GoodSprite, BadSprite, MissSprite;
+
 	public RectTransform notePanelRectTrans;
 
 	public float outTime;
@@ -38,6 +43,11 @@ public class PlayPanel : MonoBehaviour {
 	public Vector2[] buttonPositions, outPositions;
 	public PlayPanelButton[] buttons;
 	public RectTransform rectTrans;
+
+	public EasedHidable scoreFlashHidable, comboHidable, judgeHidable;
+	public CanvasGroupHidable comboGroupHidable;
+	public Text comboUiText, scoreUiText;
+	public Image judgeUiImage;
 
 	public LinkedList<PlayPanelShortNote> freeShortNoteList = new LinkedList<PlayPanelShortNote>(), activeShortNoteList = new LinkedList<PlayPanelShortNote>();
 	public LinkedList<PlayPanelLongNote> freeLongNoteList = new LinkedList<PlayPanelLongNote>(), activeLongNoteList = new LinkedList<PlayPanelLongNote>();
@@ -76,7 +86,7 @@ public class PlayPanel : MonoBehaviour {
 
 			buttons[i].Position = buttonPositions[i];
 			buttons[i].Size = new Vector2(ButtonSize, ButtonSize);
-			buttons[i].particleSystem.transform.rotation = Quaternion.Euler(0, 0, (angleSkip * i - Mathf.PI / 2) * Mathf.Rad2Deg);
+			buttons[i].longPressParticleSystem.transform.rotation = Quaternion.Euler(0, 0, (angleSkip * i - Mathf.PI / 2) * Mathf.Rad2Deg);
 		}
 
 		outTime = (OutDistance / radius) * CacheTime;
@@ -84,6 +94,8 @@ public class PlayPanel : MonoBehaviour {
 		
 	public void Init(LiveMapNote[] notes) {
 		MapNotes = notes;
+
+		PlayScheduler.ResetScore();
 
 		index = 0;
 	}
@@ -102,6 +114,7 @@ public class PlayPanel : MonoBehaviour {
 
 		if (!MusicPlayer.Instance.IsPlaying()) {
 			isPlaying = false;
+			PlayScheduler.EndPlay();
 			return;
 		}
 
@@ -198,6 +211,7 @@ public class PlayPanel : MonoBehaviour {
 				startPosition = outPositions[note.Note.lane];
 				startSize = OutSize;
 
+				Judge(note.Note.starttime, note.Note.lane);
 				note.Recycle();
 
 				freeShortNoteList.AddLast(note);
@@ -253,14 +267,8 @@ public class PlayPanel : MonoBehaviour {
 				endSize = Mathf.LerpUnclamped(StartSize, HitSize, stepEnd);
 			} else if (note.Note.endtime > time - outTime) {  // Out
 				if (note.Holding) {
-					startPosition = outPositions[note.Note.lane];
-					startSize = 1;
-					endPosition = outPositions[note.Note.lane];
-					endSize = 1;
-
-					note.Recycle();
-					freeLongNoteList.AddLast(note);
-					activeLongNoteList.Remove(longNode);
+					endPosition = buttonPositions[note.Note.lane];
+					endSize = ButtonSize;
 				} else {
 					endPosition = Vector2.LerpUnclamped(buttonPositions[note.Note.lane], outPositions[note.Note.lane], stepOutEnd);
 					endSize = Mathf.LerpUnclamped(HitSize, OutSize, stepOutEnd);
@@ -269,6 +277,7 @@ public class PlayPanel : MonoBehaviour {
 				endPosition = outPositions[note.Note.lane];
 				endSize = OutSize;
 
+				Judge(note.Note.endtime, note.Note.lane);
 				note.Recycle();
 
 				freeLongNoteList.AddLast(note);
@@ -292,6 +301,9 @@ public class PlayPanel : MonoBehaviour {
 
 			if (note.Holding) {
 				if (up) {
+					buttons[lane].shortPressParticleSystem.Play();
+					buttons[lane].longPressParticleSystem.Stop();
+					Judge(note.Note.endtime, lane);
 					note.UpdateNote(outPositions[lane], outPositions[lane], 1, 1);
 					note.Recycle();
 				} else {
@@ -318,14 +330,102 @@ public class PlayPanel : MonoBehaviour {
 
 		if (longCandidate != null && (shortCandidate == null || System.Math.Abs(longCandidate.Note.starttime - time) < System.Math.Abs(shortCandidate.Note.starttime - time))) {  // Process longCandidate
 			if (down) {
+				buttons[lane].shortPressParticleSystem.Play();
+				buttons[lane].longPressParticleSystem.Play();
+				Judge(longCandidate.Note.starttime, lane);
 				longCandidate.Holding = true;
 				longCandidate.HoldTime = time;
 			}
 		} else {  // Process shortCandidate
 			if (down) {
+				buttons[lane].shortPressParticleSystem.Play();
+				Judge(shortCandidate.Note.starttime, lane);
 				shortCandidate.UpdateNote(outPositions[lane], 1);
 				shortCandidate.Recycle();
 			}
 		}
+	}
+
+	void Judge(double expectedTime, int lane) {
+		double diff = System.Math.Abs(expectedTime - time);
+
+		if (diff <= PerfectTime) {
+			buttons[lane].source.clip = PerfectClip;
+			buttons[lane].source.Play();
+
+			judgeUiImage.sprite = PerfectSprite;
+
+			PlayScheduler.Combo += 1;
+			comboUiText.text = PlayScheduler.Combo.ToString("N0");
+			comboGroupHidable.ForceShow();
+			comboHidable.ForceShow();
+			comboHidable.Hide();
+
+			PlayScheduler.Score += (long)(2500 * 0.0125f * 1f * PlayScheduler.GetComboMultiplier());
+			scoreUiText.text = PlayScheduler.Score.ToString("N0");
+			scoreFlashHidable.ForceShow();
+			scoreFlashHidable.Hide();
+
+			if (PlayScheduler.MaxCombo < PlayScheduler.Combo) PlayScheduler.MaxCombo = PlayScheduler.Combo;
+			PlayScheduler.PerfectCount += 1;
+		} else if (diff <= GreatTime) {
+			buttons[lane].source.clip = GreatClip;
+			buttons[lane].source.Play();
+
+			judgeUiImage.sprite = GreatSprite;
+
+			PlayScheduler.Combo += 1;
+			comboUiText.text = PlayScheduler.Combo.ToString("N0");
+			comboGroupHidable.ForceShow();
+			comboHidable.ForceShow();
+			comboHidable.Hide();
+
+			PlayScheduler.Score += (long)(2500 * 0.0125f * 0.88f * PlayScheduler.GetComboMultiplier());
+			scoreUiText.text = PlayScheduler.Score.ToString("N0");
+			scoreFlashHidable.ForceShow();
+			scoreFlashHidable.Hide();
+
+			if (PlayScheduler.MaxCombo < PlayScheduler.Combo) PlayScheduler.MaxCombo = PlayScheduler.Combo;
+			PlayScheduler.GreatCount += 1;
+		} else if (diff <= GoodTime) {
+			buttons[lane].source.clip = GoodClip;
+			buttons[lane].source.Play();
+
+			judgeUiImage.sprite = GoodSprite;
+
+			PlayScheduler.Combo = 0;
+			comboGroupHidable.Hide();
+
+			PlayScheduler.Score += (long)(2500 * 0.0125f * 0.8f);
+			scoreUiText.text = PlayScheduler.Score.ToString("N0");
+			scoreFlashHidable.ForceShow();
+			scoreFlashHidable.Hide();
+
+			PlayScheduler.GoodCount += 1;
+		} else if (diff <= BadTime) {
+			
+			judgeUiImage.sprite = BadSprite;
+
+			PlayScheduler.Combo = 0;
+			comboGroupHidable.Hide();
+
+			PlayScheduler.Score += (long)(2500 * 0.0125f * 0.4f);
+			scoreUiText.text = PlayScheduler.Score.ToString("N0");
+			scoreFlashHidable.ForceShow();
+			scoreFlashHidable.Hide();
+
+			PlayScheduler.BadCount += 1;
+		} else {
+
+			judgeUiImage.sprite = MissSprite;
+
+			PlayScheduler.Combo = 0;
+			comboGroupHidable.Hide();
+
+			PlayScheduler.MissCount += 1;
+		}
+
+		judgeHidable.ForceShow();
+		judgeHidable.Hide();
 	}
 }
